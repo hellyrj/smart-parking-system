@@ -1,0 +1,243 @@
+%% Parking Search System Flowchart
+%% Save this as parking-search-flowchart.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Search System Flowchart</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#1a365d',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#2d3748',
+                lineColor: '#4a5568',
+                secondaryColor: '#2c5282',
+                tertiaryColor: '#2d3748'
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .title {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            border-bottom: 3px solid #4299e1;
+            padding-bottom: 10px;
+        }
+        
+        .legend {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4299e1;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .system-flow {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tech-item {
+            background: #e2e8f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .api-item {
+            background: #bee3f8;
+            border-left: 4px solid #3182ce;
+        }
+        
+        .db-item {
+            background: #c6f6d5;
+            border-left: 4px solid #38a169;
+        }
+        
+        .frontend-item {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">🚗 Parking Search System Flowchart</h1>
+    
+    <div class="container">
+        <div class="legend">
+            <strong>Legend:</strong>
+            <div class="legend-item" style="background: #e2e8f0;">⚪ Start/End Points</div>
+            <div class="legend-item" style="background: #bee3f8;">🔵 User Actions</div>
+            <div class="legend-item" style="background: #c6f6d5;">🟢 System Processing</div>
+            <div class="legend-item" style="background: #fed7d7;">🔴 Database Operations</div>
+            <div class="legend-item" style="background: #fefcbf;">🟡 External APIs</div>
+        </div>
+        
+        <div class="mermaid">
+        %% Parking Search System Flowchart
+        graph TD
+            %% Title
+            subgraph "Parking Search System Flow"
+            
+            %% Start
+            Start[🚗 User Opens App] --> PermCheck
+            
+            %% Permission Check
+            PermCheck{🔍 Location Permission?}
+            PermCheck -->|User Allows| GetGeoLoc
+            PermCheck -->|User Denies| ManualSearch
+            ManualSearch[📍 Manual Area Search] --> ManualInput
+            ManualInput[🗺️ Enter Location Manually] --> ManualGeoCode
+            
+            %% Geolocation
+            subgraph "Geolocation Module"
+                GetGeoLoc[📱 Browser Geolocation API] --> GetCoords[📍 Get Lat/Lng Coordinates]
+            end
+            
+            ManualGeoCode --> GetCoords
+            
+            %% Backend Request
+            GetCoords --> BackendReq[📤 Send Search Request to Backend]
+            BackendReq --> SearchAPI
+            
+            %% Search API
+            subgraph "Backend API Layer"
+                SearchAPI[🎯 GET /parking/search<br>Params: lat, lng, radius] --> DBQuery
+            end
+            
+            %% Database Operations
+            subgraph "Database Layer"
+                DBQuery[🗃️ Query Parking Table] --> FilterActive[✅ Filter: Active = TRUE]
+                FilterActive --> FilterAvailable[✅ Filter: Available Spots > 0]
+                FilterAvailable --> SpatialFilter[📐 Spatial Filter:<br>Distance ≤ Radius]
+            end
+            
+            %% Spatial Calculation
+            SpatialFilter --> DistanceCalc[📏 Calculate Distance<br>Haversine Formula]
+            DistanceCalc --> ReturnData[📊 Return Filtered Results]
+            
+            %% Frontend Display
+            ReturnData --> FrontendRecv[📥 Frontend Receives Data]
+            FrontendRecv --> DisplayMap
+            
+            subgraph "Map Visualization"
+                DisplayMap[🗺️ Initialize OpenStreetMap<br>+ Leaflet.js] --> AddMarkers[📍 Add Parking Markers<br>with Custom Icons]
+                AddMarkers --> AddList[📋 Display List Below Map]
+            end
+            
+            %% User Interaction
+            AddList --> UserInteract{👆 User Interaction}
+            UserInteract -->|Click Marker/List| ShowDetails[ℹ️ Show Parking Details]
+            UserInteract -->|Click Navigate| ExternalNav
+            
+            %% Navigation
+            ShowDetails --> NavigateBtn[🧭 'Navigate' Button]
+            NavigateBtn --> ExternalNav
+            
+            subgraph "External Navigation"
+                ExternalNav[🚀 Redirect to External Maps<br>Google Maps / OpenStreetMap]
+            end
+            
+            %% End
+            ExternalNav --> End[🎉 Navigation Started]
+            
+            end
+            
+            %% Styling
+            classDef startEnd fill:#e2e8f0,stroke:#2d3748,stroke-width:2px
+            classDef userAction fill:#bee3f8,stroke:#2c5282
+            classDef system fill:#c6f6d5,stroke:#38a169
+            classDef database fill:#fed7d7,stroke:#c53030
+            classDef api fill:#fefcbf,stroke:#d69e2e
+            
+            class Start,End startEnd
+            class PermCheck,ManualSearch,ManualInput,UserInteract,NavigateBtn userAction
+            class GetGeoLoc,GetCoords,BackendReq,ReturnData,FrontendRecv,DisplayMap,AddMarkers,AddList,ShowDetails system
+            class DBQuery,FilterActive,FilterAvailable,SpatialFilter,DistanceCalc database
+            class SearchAPI,ExternalNav,ManualGeoCode api
+        </div>
+        
+        <div class="system-flow">
+            <h3>🔧 System Architecture Flow</h3>
+            <p><strong>Browser → Backend → Database → Frontend → External Maps</strong></p>
+        </div>
+        
+        <div class="tech-stack">
+            <div class="tech-item frontend-item">Browser Geolocation API</div>
+            <div class="tech-item frontend-item">Leaflet.js</div>
+            <div class="tech-item frontend-item">OpenStreetMap</div>
+            <div class="tech-item">Node.js + Express</div>
+            <div class="tech-item db-item">MySQL Database</div>
+            <div class="tech-item db-item">Sequelize ORM</div>
+            <div class="tech-item api-item">REST API</div>
+            <div class="tech-item api-item">Google Maps API</div>
+            <div class="tech-item api-item">OpenStreetMap Routing</div>
+        </div>
+    </div>
+    
+    <script>
+        // Add click handlers for interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const techItems = document.querySelectorAll('.tech-item');
+            techItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

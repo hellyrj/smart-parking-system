@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Parking Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-parking"></i>
+                <span>ParkSmart</span>
+            </div>
+            <div class="nav-links">
+                <span class="user-role" id="userRole">Loading...</span>
+                <button onclick="logout()" class="btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <main class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h1>User Profile</h1>
+                    <div class="role-badge" id="roleBadge">Loading...</div>
+                </div>
+
+                <div class="profile-info">
+                    <div class="info-item">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <p id="userEmail">Loading...</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label><i class="fas fa-id-card"></i> User ID</label>
+                        <p id="userId">Loading...</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label><i class="fas fa-calendar-alt"></i> Account Created</label>
+                        <p id="createdAt">Loading...</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label><i class="fas fa-shield-alt"></i> Status</label>
+                        <p class="status-verified">
+                            <i class="fas fa-check-circle"></i> Verified Account
+                        </p>
+                    </div>
+                </div>
+
+                <div class="dashboard-links">
+                    <h3>Quick Actions</h3>
+                    <div class="action-grid">
+                        <a href="#" class="action-card" id="dashboardLink">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="#" class="action-card">
+                            <i class="fas fa-search"></i>
+                            <span>Find Parking</span>
+                        </a>
+                        <a href="#" class="action-card">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                        <a href="#" class="action-card">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="message" class="message"></div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const userData = await getProfile();
+            
+            if (userData.success) {
+                // Update UI with user data
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('userId').textContent = userData.id;
+                document.getElementById('userRole').textContent = `${userData.role.toUpperCase()}`;
+                document.getElementById('roleBadge').textContent = userData.role.toUpperCase();
+                document.getElementById('roleBadge').className = `role-badge role-${userData.role}`;
+                
+                // Update dashboard link based on role
+                const dashboardLink = document.getElementById('dashboardLink');
+                if (userData.role === 'admin') {
+                    dashboardLink.innerHTML = '<i class="fas fa-crown"></i><span>Admin Panel</span>';
+                }
+                
+                // Set current date as account created (since we don't have that data)
+                const now = new Date();
+                document.getElementById('createdAt').textContent = now.toLocaleDateString();
+            } else {
+                showMessage('Session expired. Please login again.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            if (messageDiv) {
+                messageDiv.textContent = text;
+                messageDiv.className = `message message-${type}`;
+                messageDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
