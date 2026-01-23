@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | DriveHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-page">
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-truck"></i>
+                <span>DriveHub</span>
+            </a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-details">
+                        <span class="user-email" id="userEmail">Loading...</span>
+                        <span class="role-badge" id="userRole"></span>
+                    </div>
+                    <button id="logoutBtn" class="btn-outline">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div id="dashboardAlert"></div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Deliveries</h3>
+                    <div class="value" id="totalDeliveries">0</div>
+                    <div class="trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12% from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Completed Today</h3>
+                    <div class="value" id="completedToday">0</div>
+                    <div class="trend positive">
+                        <i class="fas fa-check-circle"></i>
+                        <span>On track</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Vehicles</h3>
+                    <div class="value" id="activeVehicles">0</div>
+                    <div class="trend negative">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>2 in maintenance</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <div class="value" id="totalRevenue">$0</div>
+                    <div class="trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>8% increase</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminSection" class="role-section" style="display: none;">
+                <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+                <p>Welcome, Administrator! You have full system access.</p>
+                <div class="role-actions">
+                    <button class="btn-primary" onclick="adminAction('users')">
+                        <i class="fas fa-users"></i> Manage Users
+                    </button>
+                    <button class="btn-outline" onclick="adminAction('reports')">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </button>
+                    <button class="btn-danger" onclick="adminAction('settings')">
+                        <i class="fas fa-cog"></i> System Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Driver Dashboard -->
+            <div id="driverSection" class="role-section" style="display: none;">
+                <h2><i class="fas fa-truck"></i> Driver Dashboard</h2>
+                <p>Welcome, Driver! Here's your schedule for today.</p>
+                <div class="role-actions">
+                    <button class="btn-success" onclick="driverAction('start')">
+                        <i class="fas fa-play"></i> Start Shift
+                    </button>
+                    <button class="btn-outline" onclick="driverAction('route')">
+                        <i class="fas fa-map-marked-alt"></i> View Route
+                    </button>
+                    <button class="btn-outline" onclick="driverAction('deliveries')">
+                        <i class="fas fa-box"></i> My Deliveries
+                    </button>
+                </div>
+            </div>
+
+            <!-- Owner Dashboard -->
+            <div id="ownerSection" class="role-section" style="display: none;">
+                <h2><i class="fas fa-building"></i> Owner Dashboard</h2>
+                <p>Welcome, Owner! Manage your fleet and drivers.</p>
+                <div class="role-actions">
+                    <button class="btn-primary" onclick="ownerAction('vehicles')">
+                        <i class="fas fa-truck-loading"></i> Manage Fleet
+                    </button>
+                    <button class="btn-outline" onclick="ownerAction('drivers')">
+                        <i class="fas fa-user-tie"></i> Driver Management
+                    </button>
+                    <button class="btn-success" onclick="ownerAction('analytics')">
+                        <i class="fas fa-chart-line"></i> View Analytics
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                <div class="action-buttons">
+                    <button class="btn-outline" onclick="quickAction('profile')">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </button>
+                    <button class="btn-outline" onclick="quickAction('settings')">
+                        <i class="fas fa-cog"></i> Account Settings
+                    </button>
+                    <button class="btn-outline" onclick="quickAction('help')">
+                        <i class="fas fa-question-circle"></i> Help Center
+                    </button>
+                    <button class="btn-outline" onclick="quickAction('notifications')">
+                        <i class="fas fa-bell"></i> Notifications
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-feed">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div id="activityList">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>You logged in to the system</p>
+                            <span class="activity-time">Just now</span>
+                        </div>
+                    </div>
+                    <!-- More activities will be loaded by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
