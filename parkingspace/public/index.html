@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Management System | Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body class="home-page">
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-truck"></i>
+                <span>DriveHub</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+            </div>
+            <div class="user-menu" style="display: none;">
+                <div class="user-details">
+                    <span class="user-email" id="userEmail"></span>
+                    <span class="role-badge" id="userRole"></span>
+                </div>
+                <button id="logoutBtn" class="btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Welcome to DriveHub</h1>
+                <p>Streamline your fleet management, track deliveries in real-time, and optimize routes with our powerful platform.</p>
+                <div class="cta-buttons">
+                    <a href="login.html" class="btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Get Started
+                    </a>
+                    <a href="#features" class="btn-outline">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Why Choose DriveHub?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-user-shield"></i>
+                        <h3>Secure & Reliable</h3>
+                        <p>Enterprise-grade security with JWT authentication and role-based access control.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users-cog"></i>
+                        <h3>Multi-Role System</h3>
+                        <p>Seamless experience for Admins, Drivers, and Owners with tailored dashboards.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Real-Time Analytics</h3>
+                        <p>Monitor performance, track deliveries, and optimize operations with live insights.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
