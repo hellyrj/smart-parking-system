@@ -1,24 +1,43 @@
-// controllers/parkingController.js
+import { Op, literal } from "sequelize";
 import ParkingSpace from "../models/parkingSpace.js";
-//import ParkingLocation from "../models/ParkingLocation.js";
+import ParkingLocation from "../models/parkingLocation.js";
 
-export const createParking = async (req, res) => {
-  const { name, total_spots, price_per_hour, latitude, longitude, address } = req.body;
+export const searchParking = async (req, res) => {
+  try {
+    const { lat, lng, radius = 3 } = req.query;
 
-  const parking = await ParkingSpace.create({
-    name,
-    total_spots,
-    available_spots: total_spots,
-    price_per_hour,
-    owner_id: req.user.id,
-  });
-/*
-  await ParkingLocation.create({
-    parking_id: parking.id,
-    latitude,
-    longitude,
-    address,
-  }); */
+    if (!lat || !lng) {
+      return res.status(400).json({ message: "Latitude and longitude required" });
+    }
 
-  res.status(201).json({ message: "Parking space created" });
+    // Haversine formula (distance in KM)
+    const distanceFormula = `
+      (6371 * acos(
+        cos(radians(${lat})) *
+        cos(radians(latitude)) *
+        cos(radians(longitude) - radians(${lng})) +
+        sin(radians(${lat})) *
+        sin(radians(latitude))
+      ))
+    `;
+
+    const parkings = await ParkingSpace.findAll({
+      where: {
+        is_active: true,
+        available_spots: { [Op.gt]: 0 },
+      },
+      include: [
+        {
+          model: ParkingLocation,
+          attributes: ["latitude", "longitude", "address"],
+          where: literal(`${distanceFormula} <= ${radius}`),
+        },
+      ],
+    });
+
+    res.json(parkings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Search failed" });
+  }
 };

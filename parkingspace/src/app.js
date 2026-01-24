@@ -1,5 +1,7 @@
 import express from "express";
+
 import authRoutes from "./routes/authRoutes.js";
+import parkingRoutes from "./routes/parkingRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -19,18 +21,19 @@ app.use((req, res, next) => {
     next();
 });
 
+// API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/parking/search", parkingRoutes);
+
 // Serve static files from the 'public' directory
 // Assuming your app.js is in /backend and public is in /public
 app.use(express.static(path.join(__dirname, '..', 'public')));
-
-// API routes
-app.use("/auth", authRoutes);
 
 // Catch-all route for SPA
 // Serve index.html for any unknown routes (except /auth routes)
 app.get(/.*/,(req, res) => {
     // Don't interfere with API routes
-    if (req.path.startsWith('/auth')) {
+    if (req.path.startsWith('/api')) {
         return res.status(404).json({ message: 'API endpoint not found' });
     }
     
@@ -38,7 +41,7 @@ app.get(/.*/,(req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Add error handling middleware
 app.use((err, req, res, next) => {

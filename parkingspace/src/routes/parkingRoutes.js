@@ -1,11 +1,8 @@
-// routes/parkingRoutes.js
 import express from "express";
-import { createParking } from "../controllers/parkingController.js";
-//import { protect } from "../middleware/auth.js";
-import { requireOwner } from "../middleware/roleMiddleware.js";
+import { searchParking } from "../controllers/parkingController.js";
 
 const router = express.Router();
 
-router.post("/", protect, requireOwner, createParking);
+router.get("/search", searchParking);
 
 export default router;

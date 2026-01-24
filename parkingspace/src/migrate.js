@@ -1,11 +1,10 @@
-import sequelize from "./config/db.js";
-import User from "./models/User.js";
+import { sequelize } from "./models/index.js";
 
 (async () => {
   try {
-    await sequelize.sync({ alter: true }); // creates/updates tables
-    console.log("✅ Database connected & tables synced!");
+    await sequelize.sync({ alter: true });
+    console.log("✅ Database connected & all tables synced!");
   } catch (err) {
-    console.error("❌ Database connection failed:", err);
+    console.error("❌ Sync failed:", err);
   }
 })();
