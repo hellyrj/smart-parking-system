@@ -4,14 +4,47 @@
   <meta charset="UTF-8" />
   <title>Register</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/register.css">
 </head>
 <body>
 
   <h2>Register</h2>
 
   <form id="registerForm">
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
+
+    <!-- Name -->
+    <input 
+      type="text" 
+      id="name" 
+      placeholder="Full Name" 
+      required 
+    />
+
+    <!-- Email -->
+    <input 
+      type="email" 
+      id="email" 
+      placeholder="Email" 
+      required 
+    />
+    <small class="input-hint">Please enter a valid email address</small>
+
+    <!-- Password -->
+    <input 
+      type="password" 
+      id="password" 
+      placeholder="Password" 
+      required 
+    />
+    <small class="password-hint">
+      Password should include at least one uppercase letter and one number
+    </small>
+
+    <!-- Role -->
+    <select id="role">
+      <option value="driver">Driver</option>
+      <option value="owner">Owner</option>
+    </select>
 
     <button type="submit">Register</button>
   </form>

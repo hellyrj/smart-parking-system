@@ -270,3 +270,75 @@ body {
         padding: 0.6rem 1.2rem;
     }
 }
+
+/* ========================= */
+/* AUTH FORM ENHANCEMENTS */
+/* ========================= */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+/* Focus */
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+}
+
+/* Invalid email */
+input:invalid {
+  border-color: #dc3545;
+}
+
+/* Password strength */
+input.weak {
+  border-color: #dc3545;
+}
+
+input.medium {
+  border-color: #ffc107;
+}
+
+input.strong {
+  border-color: #28a745;
+}
+
+/* Helper text */
+.input-hint,
+.password-hint {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Submit button */
+button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+}

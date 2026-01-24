@@ -131,3 +131,20 @@
         gap: 1rem;
     }
 }
+.password-message {
+  font-size: 0.9rem;
+  margin-top: 5px;
+  color: red;
+}
+
+#password.weak {
+  border: 2px solid red;
+}
+
+#password.medium {
+  border: 2px solid orange;
+}
+
+#password.strong {
+  border: 2px solid green;
+}
