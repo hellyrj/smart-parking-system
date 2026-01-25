@@ -209,7 +209,17 @@ export const deleteParking = async (req, res) => {
 
 export const searchParking = async (req, res) => {
   try {
-    const { lat, lng, radius = 3 } = req.query;
+    const { latNum, lngNum, radiusNUM = 3 } = req.query;
+
+     if (!latNum || !lngNum) {
+      return res
+        .status(400)
+        .json({ message: "Latitude and longitude required" });
+    }
+
+    const lat = parseFloat(latNum);
+    const lng = parseFloat(lngNum);
+    const radius = parseFloat(radiusNUM);
 
     if (!lat || !lng) {
       return res.status(400).json({ message: "Latitude and longitude required" });

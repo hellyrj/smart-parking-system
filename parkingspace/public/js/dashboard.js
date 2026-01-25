@@ -1,211 +1,401 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Check authentication
-    if (!checkAuth(true)) return;
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuth();
+    loadUserInfo();
+    checkActiveSession();
+    loadMyParkings();
     
-    // Initialize dashboard
-    loadDashboardData();
-    setupEventListeners();
-    updateUserInfo();
-    setupRoleBasedContent();
+    // Show map section by default
+    showSection('map-section');
+    
+    // Initialize map
+    if (typeof initMap === 'function') {
+        initMap();
+    }
 });
 
-function loadDashboardData() {
-    // Load user profile
-    loadUserProfile();
+// Load user information
+function loadUserInfo() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userEmail = document.getElementById('user-email');
+    const profileEmail = document.getElementById('profile-email');
     
-    // Load role-specific data
-    if (auth.isAdmin()) {
-        loadAdminData();
-    } else if (auth.isDriver()) {
-        loadDriverData();
-    } else if (auth.isOwner()) {
-        loadOwnerData();
-    }
+    if (userEmail) userEmail.textContent = user.email || 'User';
+    if (profileEmail) profileEmail.textContent = user.email || 'Loading...';
     
-    // Load activity feed
-    loadActivityFeed();
+    // Set member since (for demo)
+    document.getElementById('member-since').textContent = new Date().toLocaleDateString();
 }
 
-function loadUserProfile() {
-    auth.getProfile().then(profile => {
-        document.getElementById('userEmail').textContent = profile.email;
-    }).catch(error => {
-        console.error('Failed to load profile:', error);
-        document.getElementById('userEmail').textContent = `User #${auth.user.id}`;
-        
-        if (error.message.includes('Session expired')) {
-            showAlert('Your session has expired. Please login again.', 'error', 'dashboardAlert');
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
+// Check for active parking session
+async function checkActiveSession() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+        // This endpoint doesn't exist yet - you'll need to create it
+        // For now, we'll use a dummy check
+        const response = await fetch(`${API_BASE_URL}/sessions/active`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const session = await response.json();
+            if (session) {
+                showActiveSession(session);
+            }
         }
-    });
-}
-
-function loadAdminData() {
-    // Mock data for admin
-    document.getElementById('totalDeliveries').textContent = '156';
-    document.getElementById('completedToday').textContent = '24';
-    document.getElementById('activeVehicles').textContent = '8';
-    document.getElementById('totalRevenue').textContent = '$4,850';
-}
-
-function loadDriverData() {
-    // Mock data for driver
-    document.getElementById('totalDeliveries').textContent = '42';
-    document.getElementById('completedToday').textContent = '5';
-    document.getElementById('activeVehicles').textContent = '1';
-    document.getElementById('totalRevenue').textContent = '$850';
-}
-
-function loadOwnerData() {
-    // Mock data for owner
-    document.getElementById('totalDeliveries').textContent = '89';
-    document.getElementById('completedToday').textContent = '12';
-    document.getElementById('activeVehicles').textContent = '3';
-    document.getElementById('totalRevenue').textContent = '$2,150';
-}
-
-function loadActivityFeed() {
-    const activityList = document.getElementById('activityList');
-    const activities = [
-        { icon: 'fa-sign-in-alt', text: 'Logged in to the system', time: 'Just now' },
-        { icon: 'fa-user-check', text: 'Profile updated successfully', time: '2 hours ago' },
-        { icon: 'fa-truck', text: 'Started new delivery route', time: '4 hours ago' },
-        { icon: 'fa-check-circle', text: 'Completed delivery #DH-4231', time: '6 hours ago' },
-        { icon: 'fa-map-marker-alt', text: 'Updated current location', time: 'Yesterday' }
-    ];
-    
-    // Add more role-specific activities
-    if (auth.isAdmin()) {
-        activities.push(
-            { icon: 'fa-users', text: 'Reviewed driver performance reports', time: '2 days ago' },
-            { icon: 'fa-cog', text: 'Updated system settings', time: '3 days ago' }
-        );
-    } else if (auth.isDriver()) {
-        activities.push(
-            { icon: 'fa-route', text: 'Optimized delivery route for efficiency', time: '2 days ago' },
-            { icon: 'fa-gas-pump', text: 'Recorded fuel consumption', time: '3 days ago' }
-        );
-    } else if (auth.isOwner()) {
-        activities.push(
-            { icon: 'fa-chart-line', text: 'Viewed monthly revenue report', time: '2 days ago' },
-            { icon: 'fa-truck-loading', text: 'Added new vehicle to fleet', time: '4 days ago' }
-        );
+    } catch (error) {
+        console.error('Error checking session:', error);
     }
+}
+
+// Show active session
+function showActiveSession(session) {
+    const sessionInfo = document.getElementById('session-info');
+    const sessionBadge = document.getElementById('session-badge');
     
-    // Clear loading activity
-    activityList.innerHTML = '';
+    sessionBadge.classList.remove('hidden');
     
-    // Add activities
-    activities.forEach(activity => {
-        const activityItem = document.createElement('div');
-        activityItem.className = 'activity-item';
-        activityItem.innerHTML = `
-            <div class="activity-icon">
-                <i class="fas ${activity.icon}"></i>
+    sessionInfo.innerHTML = `
+        <div class="active-session-card">
+            <h3><i class="fas fa-car"></i> Active Parking Session</h3>
+            <div class="session-details">
+                <div class="detail-item">
+                    <label>Started:</label>
+                    <span>${new Date(session.start_time).toLocaleString()}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Location:</label>
+                    <span>${session.parking_name || 'Unknown'}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Price/Hour:</label>
+                    <span>$${session.price_per_hour || '0.00'}</span>
+                </div>
             </div>
-            <div class="activity-details">
-                <p>${activity.text}</p>
-                <span class="activity-time">${activity.time}</span>
+            <button class="btn-primary btn-danger" onclick="endParkingSession()">
+                <i class="fas fa-stop-circle"></i> End Session
+            </button>
+        </div>
+    `;
+}
+
+// End parking session
+async function endParkingSession() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    if (!confirm('Are you sure you want to end this parking session?')) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/sessions/end`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Session ended successfully!');
+            checkActiveSession();
+            showSection('map-section');
+        } else {
+            alert(data.message || 'Failed to end session');
+        }
+    } catch (error) {
+        console.error('Error ending session:', error);
+        alert('An error occurred');
+    }
+}
+
+// Load user's parking spaces
+async function loadMyParkings() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/parkings/mine`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const parkings = await response.json();
+
+        if (response.ok) {
+            displayMyParkings(parkings);
+        }
+    } catch (error) {
+        console.error('Error loading parkings:', error);
+    }
+}
+
+// Display user's parking spaces
+function displayMyParkings(parkings) {
+    const container = document.getElementById('my-parkings-list');
+    
+    if (!parkings || parkings.length === 0) {
+        container.innerHTML = `
+            <div class="no-parkings">
+                <i class="fas fa-warehouse"></i>
+                <h3>No Parking Spaces</h3>
+                <p>You haven't registered any parking spaces yet.</p>
+                <button class="btn-primary" onclick="showAddParking()">
+                    <i class="fas fa-plus"></i> Add Parking Space
+                </button>
             </div>
         `;
-        activityList.appendChild(activityItem);
+        return;
+    }
+
+    container.innerHTML = parkings.map(parking => `
+        <div class="parking-card">
+            <h3>${parking.name}</h3>
+            <p>${parking.description || 'No description'}</p>
+            <div class="parking-details">
+                <div class="detail">
+                    <i class="fas fa-car"></i>
+                    <span>${parking.available_spots}/${parking.total_spots} spots</span>
+                </div>
+                <div class="detail">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>$${parking.price_per_hour}/hour</span>
+                </div>
+                <div class="detail">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${parking.parkingLocation?.address || 'No address'}</span>
+                </div>
+            </div>
+            <div class="parking-actions">
+                <button class="btn-secondary" onclick="editParking(${parking.id})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-primary" onclick="viewParking(${parking.id})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show section
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
     });
-}
 
-function updateUserInfo() {
-    const userRole = document.getElementById('userRole');
-    userRole.textContent = auth.user.role;
-    userRole.className = `role-badge ${auth.user.role}`;
-}
-
-function setupRoleBasedContent() {
-    // Hide all sections first
-    document.getElementById('adminSection').style.display = 'none';
-    document.getElementById('driverSection').style.display = 'none';
-    document.getElementById('ownerSection').style.display = 'none';
-    
-    // Show role-specific section
-    if (auth.isAdmin()) {
-        document.getElementById('adminSection').style.display = 'block';
-    } else if (auth.isDriver()) {
-        document.getElementById('driverSection').style.display = 'block';
-    } else if (auth.isOwner()) {
-        document.getElementById('ownerSection').style.display = 'block';
-    }
-}
-
-function setupEventListeners() {
-    // Logout button
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        auth.logout();
-        window.location.href = 'index.html';
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
     });
+
+    // Show selected section
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.classList.add('active');
+    }
+
+    // Update active nav item
+    const navItem = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+    if (navItem) {
+        navItem.classList.add('active');
+    }
+
+    // Update page title
+    const titleMap = {
+        'map-section': 'Parking Map',
+        'active-session': 'Active Session',
+        'my-parkings': 'My Parkings',
+        'history': 'Parking History',
+        'profile': 'My Profile'
+    };
+
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle && titleMap[sectionId]) {
+        pageTitle.textContent = titleMap[sectionId];
+    }
+}
+
+// Toggle sidebar (mobile)
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('active');
+}
+
+// Show add parking modal
+function showAddParking() {
+    document.getElementById('modal-title').textContent = 'Add Parking Space';
+    document.getElementById('modal-body').innerHTML = `
+        <form id="addParkingForm">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="parkingName" placeholder="Parking Space Name" required>
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea id="parkingDescription" placeholder="Description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Total Spots:</label>
+                <input type="number" id="totalSpots" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+                <label>Price per Hour ($):</label>
+                <input type="number" id="pricePerHour" min="0.5" step="0.5" value="5.00" required>
+            </div>
+            <div class="form-group">
+                <label>Latitude:</label>
+                <input type="number" id="latitude" step="any" placeholder="37.7749" required>
+            </div>
+            <div class="form-group">
+                <label>Longitude:</label>
+                <input type="number" id="longitude" step="any" placeholder="-122.4194" required>
+            </div>
+            <div class="form-group">
+                <label>Address:</label>
+                <input type="text" id="address" placeholder="Full address">
+            </div>
+            <div class="form-group">
+                <label>City:</label>
+                <input type="text" id="city" placeholder="City">
+            </div>
+            <button type="submit" class="btn-primary">Create Parking Space</button>
+        </form>
+    `;
+
+    // Get current location for convenience
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+            document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+            
+            // Reverse geocode to get address
+            reverseGeocode(position.coords.latitude, position.coords.longitude);
+        });
+    }
+
+    document.getElementById('parking-modal').style.display = 'block';
     
-    // Refresh dashboard data every 5 minutes
-    setInterval(() => {
-        console.log('Refreshing dashboard data...');
-        loadDashboardData();
-    }, 5 * 60 * 1000);
+    // Add form submit handler
+    setTimeout(() => {
+        const form = document.getElementById('addParkingForm');
+        if (form) {
+            form.addEventListener('submit', handleAddParking);
+        }
+    }, 100);
 }
 
-// Action handlers
-function adminAction(action) {
-    switch(action) {
-        case 'users':
-            showAlert('Opening user management panel...', 'info', 'dashboardAlert');
-            break;
-        case 'reports':
-            showAlert('Loading system reports...', 'info', 'dashboardAlert');
-            break;
-        case 'settings':
-            showAlert('Opening system settings...', 'info', 'dashboardAlert');
-            break;
+// Handle add parking form submission
+async function handleAddParking(e) {
+    e.preventDefault();
+    
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const parkingData = {
+        name: document.getElementById('parkingName').value,
+        description: document.getElementById('parkingDescription').value,
+        total_spots: parseInt(document.getElementById('totalSpots').value),
+        price_per_hour: parseFloat(document.getElementById('pricePerHour').value),
+        latitude: parseFloat(document.getElementById('latitude').value),
+        longitude: parseFloat(document.getElementById('longitude').value),
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/parkings`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(parkingData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Parking space created successfully!');
+            closeModal();
+            loadMyParkings();
+            showSection('my-parkings');
+        } else {
+            alert(data.message || 'Failed to create parking space');
+        }
+    } catch (error) {
+        console.error('Error creating parking:', error);
+        alert('An error occurred');
     }
 }
 
-function driverAction(action) {
-    switch(action) {
-        case 'start':
-            showAlert('Starting your shift...', 'success', 'dashboardAlert');
-            break;
-        case 'route':
-            showAlert('Loading today\'s route...', 'info', 'dashboardAlert');
-            break;
-        case 'deliveries':
-            showAlert('Opening delivery list...', 'info', 'dashboardAlert');
-            break;
+// Reverse geocode coordinates to address
+async function reverseGeocode(lat, lng) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const data = await response.json();
+        
+        if (data.address) {
+            const address = data.address;
+            const fullAddress = [
+                address.road,
+                address.suburb,
+                address.city || address.town || address.village,
+                address.state,
+                address.country
+            ].filter(Boolean).join(', ');
+            
+            document.getElementById('address').value = fullAddress;
+            document.getElementById('city').value = address.city || address.town || address.village || '';
+        }
+    } catch (error) {
+        console.error('Reverse geocoding error:', error);
     }
 }
 
-function ownerAction(action) {
-    switch(action) {
-        case 'vehicles':
-            showAlert('Opening fleet management...', 'info', 'dashboardAlert');
-            break;
-        case 'drivers':
-            showAlert('Loading driver management...', 'info', 'dashboardAlert');
-            break;
-        case 'analytics':
-            showAlert('Opening analytics dashboard...', 'info', 'dashboardAlert');
-            break;
+// Close modal
+function closeModal() {
+    document.getElementById('parking-modal').style.display = 'none';
+}
+
+// View parking details
+function viewParking(parkingId) {
+    // Implement view parking details
+    alert(`View parking ${parkingId} - This feature is coming soon!`);
+}
+
+// Edit parking
+function editParking(parkingId) {
+    // Implement edit parking
+    alert(`Edit parking ${parkingId} - This feature is coming soon!`);
+}
+
+// Locate user on map
+function locateUser() {
+    if (typeof locateOnMap === 'function') {
+        locateOnMap();
     }
 }
 
-function quickAction(action) {
-    switch(action) {
-        case 'profile':
-            showAlert('Opening profile editor...', 'info', 'dashboardAlert');
-            break;
-        case 'settings':
-            showAlert('Opening account settings...', 'info', 'dashboardAlert');
-            break;
-        case 'help':
-            showAlert('Opening help center...', 'info', 'dashboardAlert');
-            break;
-        case 'notifications':
-            showAlert('Showing notifications...', 'info', 'dashboardAlert');
-            break;
+// Search nearby parkings
+function searchNearbyParkings() {
+    if (typeof searchParkings === 'function') {
+        searchParkings();
     }
 }
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('parking-modal');
+    if (event.target === modal) {
+        closeModal();
+    }
+};

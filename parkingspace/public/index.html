@@ -3,76 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Management System | Home</title>
+    <title>ParkSmart - Find Parking Easily</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="home-page">
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-truck"></i>
-                <span>DriveHub</span>
-            </a>
+<body>
+    <div class="landing-container">
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-parking"></i>
+                <span>ParkSmart</span>
+            </div>
             <div class="nav-links">
-                <a href="index.html" class="active">Home</a>
-                <a href="login.html">Login</a>
-                <a href="register.html">Register</a>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <button class="btn-login" onclick="navigateToLogin()">Login</button>
             </div>
-            <div class="user-menu" style="display: none;">
-                <div class="user-details">
-                    <span class="user-email" id="userEmail"></span>
-                    <span class="role-badge" id="userRole"></span>
-                </div>
-                <button id="logoutBtn" class="btn-outline">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </div>
-    </nav>
+        </nav>
 
-    <main>
         <section class="hero">
-            <div class="container">
-                <h1>Welcome to DriveHub</h1>
-                <p>Streamline your fleet management, track deliveries in real-time, and optimize routes with our powerful platform.</p>
-                <div class="cta-buttons">
-                    <a href="login.html" class="btn-primary">
+            <div class="hero-content">
+                <h1>Find Parking Made <span class="highlight">Simple</span></h1>
+                <p>Locate available parking spots in real-time, book instantly, and pay seamlessly.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="navigateToLogin()">
                         <i class="fas fa-sign-in-alt"></i> Get Started
-                    </a>
-                    <a href="#features" class="btn-outline">
+                    </button>
+                    <button class="btn-secondary" onclick="scrollToFeatures()">
                         <i class="fas fa-info-circle"></i> Learn More
-                    </a>
+                    </button>
                 </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Parking Illustration">
             </div>
         </section>
 
         <section id="features" class="features">
-            <div class="container">
-                <h2>Why Choose DriveHub?</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-user-shield"></i>
-                        <h3>Secure & Reliable</h3>
-                        <p>Enterprise-grade security with JWT authentication and role-based access control.</p>
+            <h2>Why Choose ParkSmart?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-users-cog"></i>
-                        <h3>Multi-Role System</h3>
-                        <p>Seamless experience for Admins, Drivers, and Owners with tailored dashboards.</p>
+                    <h3>Real-Time Availability</h3>
+                    <p>See available parking spots in real-time on an interactive map.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Real-Time Analytics</h3>
-                        <p>Monitor performance, track deliveries, and optimize operations with live insights.</p>
+                    <h3>Quick Booking</h3>
+                    <p>Start parking sessions instantly with just one tap.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wallet"></i>
                     </div>
+                    <h3>Seamless Payments</h3>
+                    <p>Automatic payment calculation when you end your session.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Secure Platform</h3>
+                    <p>Your data and payments are protected with encryption.</p>
                 </div>
             </div>
         </section>
-    </main>
 
-    <script src="js/auth.js"></script>
-    <script src="js/home.js"></script>
+        <section id="how-it-works" class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Login & Locate</h3>
+                    <p>Sign in and allow location access to find parking near you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Select & Start</h3>
+                    <p>Choose a parking spot and start your session.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Park & Go</h3>
+                    <p>Park your vehicle and go about your business.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>End & Pay</h3>
+                    <p>End session when you return. Payment is automatically calculated.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-parking"></i>
+                    <span>ParkSmart</span>
+                </div>
+                <p>© 2024 ParkSmart. All rights reserved.</p>
+                <p>Simplifying parking, one spot at a time.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function navigateToLogin() {
+            window.location.href = 'login.html';
+        }
+        
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>

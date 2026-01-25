@@ -4,7 +4,7 @@ import sequelize from "../config/db.js";
 const ParkingSession = sequelize.define("parkingSession", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 
-  start_time: { type: DataTypes.DATE, allowNull: false },
+  start_time: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
 
   end_time: { type: DataTypes.DATE },
 

@@ -1,56 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Register</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/register.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - ParkSmart</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-parking"></i>
+                    <span>ParkSmart</span>
+                </div>
+                <h2>Create Account</h2>
+                <p>Join ParkSmart to start finding parking spots</p>
+            </div>
 
-  <h2>Register</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regEmail">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="regEmail" placeholder="Enter your email" required>
+                </div>
 
-  <form id="registerForm">
+                <div class="form-group">
+                    <label for="regPassword">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="regPassword" placeholder="Create a password" required>
+                </div>
 
-    <!-- Name -->
-    <input 
-      type="text" 
-      id="name" 
-      placeholder="Full Name" 
-      required 
-    />
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                </div>
 
-    <!-- Email -->
-    <input 
-      type="email" 
-      id="email" 
-      placeholder="Email" 
-      required 
-    />
-    <small class="input-hint">Please enter a valid email address</small>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                </div>
 
-    <!-- Password -->
-    <input 
-      type="password" 
-      id="password" 
-      placeholder="Password" 
-      required 
-    />
-    <small class="password-hint">
-      Password should include at least one uppercase letter and one number
-    </small>
+                <button type="submit" class="btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
 
-    <!-- Role -->
-    <select id="role">
-      <option value="driver">Driver</option>
-      <option value="owner">Owner</option>
-    </select>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="login.html">Login here</a></p>
+                    <p><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a></p>
+                </div>
+            </form>
+        </div>
 
-    <button type="submit">Register</button>
-  </form>
+        <div class="auth-image">
+            <img src="https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Modern Parking">
+            <div class="image-overlay">
+                <h3>Start Parking Smart</h3>
+                <p>Join our community of smart parkers</p>
+            </div>
+        </div>
+    </div>
 
-  <p>Already have an account? <a href="login.html">Login</a></p>
-
-  <script src="js/register.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

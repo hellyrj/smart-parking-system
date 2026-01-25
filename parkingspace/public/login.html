@@ -1,30 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ParkSmart</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-parking"></i>
+                    <span>ParkSmart</span>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Login to find and manage parking spots</p>
+            </div>
 
-  <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
 
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <div id="passwordMessage" class="password-message"></div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
 
-    <select id="role">
-      <option value="driver">Driver</option>
-      <option value="owner">Owner</option>
-    </select>
+                <button type="submit" class="btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
 
-    <button type="submit">Login</button>
-  </form>
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="register.html">Register here</a></p>
+                    <p><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a></p>
+                </div>
+            </form>
+        </div>
 
-  <p>Don't have an account? <a href="register.html">Register</a></p>
+        <div class="auth-image">
+            <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Parking Lot">
+            <div class="image-overlay">
+                <h3>Find Your Perfect Spot</h3>
+                <p>Access thousands of parking locations instantly</p>
+            </div>
+        </div>
+    </div>
 
-  <script src="js/login.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
