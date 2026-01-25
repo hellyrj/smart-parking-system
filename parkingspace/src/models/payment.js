@@ -44,16 +44,24 @@ Payment.createCompletedPayment = async function (
   { session_id, amount, payment_method },
   transaction
 ) {
+   // Calculate fees first
+  const platformFee = Number(amount) * PLATFORM_FEE_PERCENTAGE;
+  const ownerAmount = Number(amount) - platformFee;
+
+  // Create payment record
   const payment = await Payment.create(
     {
       session_id,
       amount,
       payment_method,
+      platform_fee: platformFee,
+      owner_amount: ownerAmount,
+      payment_status: "paid",
+      paid_at: new Date(),
     },
     { transaction }
   );
 
-  await payment.completePayment(transaction);
   return payment;
 };
 
