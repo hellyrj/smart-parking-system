@@ -7,6 +7,14 @@ async searchParking(lat, lng) {
   );
   return res.json();
 },
+async getMyActiveSession() {
+  const res = await fetch(`${API_BASE}/sessions/active`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return await res.json();
+},
 
   async startSession(parkingId) {
     const res = await fetch(`${API_BASE}/sessions/start`, {

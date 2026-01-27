@@ -11,13 +11,3 @@ async function startParking(parkingId) {
   }
 }
 
-endBtn.addEventListener("click", async () => {
-  const res = await API.endSession();
-
-  alert(
-    `Parking ended\nHours: ${res.duration_hours}\nPaid: ${res.payment.amount}`
-  );
-
-  endBtn.style.display = "none";
-});
-

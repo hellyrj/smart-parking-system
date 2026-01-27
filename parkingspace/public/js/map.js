@@ -4,22 +4,58 @@ let markers = [];
 const findBtn = document.getElementById("findParkingBtn");
 const parkingList = document.getElementById("parking-list");
 
+// Update your findBtn click handler:
 findBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
     alert("Geolocation not supported");
     return;
   }
 
+  // Show precise location request
+  alert("Please allow HIGH ACCURACY location when prompted by your browser");
+
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
-
+      const accuracy = position.coords.accuracy;
+      
+      console.log("📍 GPS Accuracy:", accuracy + " meters");
+      
+      // Warn if accuracy is poor
+      if (accuracy > 100) { // More than 100 meters is poor
+        alert(`⚠️ Low GPS accuracy: ${accuracy}m\n\nTry moving to a window or outdoors for better signal.`);
+      }
+      
       initMap(lat, lng);
       searchNearby(lat, lng);
+      searchByLocation(lat, lng, "gps");
     },
-    () => {
-      alert("Location permission denied");
+    (error) => {
+      console.error("Geolocation error:", error);
+      
+      // Try fallback with less accuracy
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          initMap(lat, lng);
+          searchNearby(lat, lng);
+        },
+        () => {
+          alert(`Location error: ${error.message}\n\nTry these fixes:\n1. Allow location in browser settings\n2. Try incognito mode\n3. Check Chromebook location settings`);
+        },
+        {
+          enableHighAccuracy: false, // Try without high accuracy
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    },
+    {
+      enableHighAccuracy: true, // CRITICAL: Force GPS
+      timeout: 15000, // Give it more time
+      maximumAge: 0 // Don't use cached location
     }
   );
 });
@@ -48,6 +84,16 @@ async function searchNearby(lat, lng) {
   renderParkings(parkings);
   renderMarkers(parkings);
 }
+
+function moveMapToLocation(lat, lng, name) {
+  map.setView([lat, lng], 15);
+
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(name)
+    .openPopup();
+}
+
 
 function renderMarkers(parkings) {
   parkings.forEach((p) => {
@@ -95,4 +141,28 @@ function renderParkings(parkings) {
 function clearMarkers() {
   markers.forEach((m) => map.removeLayer(m));
   markers = [];
+}
+
+async function searchByLocation(lat, lng, source = "manual") {
+  console.log(`Searching from ${source}: ${lat}, ${lng}`);
+  
+  if (!map) {
+    initMap(lat, lng);
+  } else {
+    map.setView([lat, lng], 14);
+  }
+  
+  // Clear existing user marker if exists
+  if (window.userMarker) {
+    map.removeLayer(window.userMarker);
+  }
+  
+  // Add marker at search location
+  window.userMarker = L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(`📍 ${source === "gps" ? "You are here" : "Search location"}`)
+    .openPopup();
+  
+  // Search for parking
+  searchNearby(lat, lng);
 }

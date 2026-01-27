@@ -26,10 +26,13 @@ parkings.forEach((p) => {
     <button onclick="editParking(${p.id})">✏️ Edit</button>
 
     ${
-      p.is_active
-        ? `<button onclick="deactivateParking(${p.id})">⛔ Deactivate</button>`
-        : `<button onclick="activateParking(${p.id})">✅ Activate</button>`
-    }
+  p.is_active
+    ? `<button onclick="deactivateParking(${p.id})">⛔ Deactivate</button>`
+    : p.total_spots === 0
+      ? `<button disabled title="Add spots before activating">🚫 Cannot Activate</button>`
+      : `<button onclick="activateParking(${p.id})">✅ Activate</button>`
+}
+
 
     <button onclick="deleteParking(${p.id})">🗑 Delete</button>
   `;

@@ -185,6 +185,10 @@ export const activateParking = async (req, res) => {
       return res.status(403).json({ message: "You are not allowed to activate this parking" });
     }
 
+    if (parking.total_spots === 0) {
+      return res.status(400).json({ message: "Cannot activate parking with zero total spots" });
+    }
+
     parking.is_active = true;
     await parking.save();
 
@@ -235,23 +239,24 @@ export const deleteParking = async (req, res) => {
 
 export const searchParking = async (req, res) => {
   try {
-    const { latNum, lngNum, radiusNUM = 3 } = req.query;
+    const { latNum, lngNum, radiusNUM } = req.query;
 
-     if (!latNum || !lngNum) {
-      return res
-        .status(400)
-        .json({ message: "Latitude and longitude required" });
+    if (latNum === undefined || lngNum === undefined) {
+      return res.status(400).json({
+        message: "Latitude and longitude required",
+      });
     }
 
-    const lat = parseFloat(latNum);
-    const lng = parseFloat(lngNum);
-    const radius = parseFloat(radiusNUM);
+    const lat = Number(latNum);
+    const lng = Number(lngNum);
+    const radius = Number(radiusNUM) || 3;
 
-    if (!lat || !lng) {
-      return res.status(400).json({ message: "Latitude and longitude required" });
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      return res.status(400).json({
+        message: "Invalid latitude or longitude",
+      });
     }
 
-    // Haversine formula (distance in KM)
     const distanceFormula = literal(`
       (6371 * ACOS(
         COS(RADIANS(${lat})) *
@@ -271,11 +276,7 @@ export const searchParking = async (req, res) => {
         {
           model: parkingLocation,
           attributes: ["latitude", "longitude", "address", "city"],
-          where: {
-            [Op.and]: [
-              sequelize.where(distanceFormula, '<=', radius)
-            ]
-          },
+          where: sequelize.where(distanceFormula, "<=", radius),
         },
       ],
     });
@@ -286,6 +287,7 @@ export const searchParking = async (req, res) => {
     res.status(500).json({ message: "Search failed" });
   }
 };
+
 
 
 

@@ -58,6 +58,7 @@ export const startParkingSession = async (req, res) => {
 /**
  * 🏁 END PARKING SESSION
  */
+
 export const endParkingSession = async (req, res) => {
   const userId = req.user.id;
 
@@ -78,9 +79,14 @@ export const endParkingSession = async (req, res) => {
         transaction: t,
       });
 
-      // 3️⃣ End session
+      if (!parking) {
+        throw new Error("Parking space not found");
+      }
+
+      // 3️⃣ End session - BOTH end_time AND status
       const endTime = new Date();
       session.end_time = endTime;
+      session.status = "completed"; // ADD THIS LINE
       await session.save({ transaction: t });
 
       // 4️⃣ Calculate duration (hours, minimum 1)
@@ -93,10 +99,10 @@ export const endParkingSession = async (req, res) => {
       // 5️⃣ Calculate amount
       const amount = hours * parking.price_per_hour;
 
-      // 6️⃣ Release spot (MODEL LOGIC)
+      // 6️⃣ Release spot
       await parking.releaseSpot(t);
 
-      // 7️⃣ Create & complete payment (MODEL LOGIC)
+      // 7️⃣ Create & complete payment
       const paymentRecord = await PaymentModel.createCompletedPayment(
         {
           session_id: session.id,
@@ -106,15 +112,83 @@ export const endParkingSession = async (req, res) => {
         t
       );
 
-      return { hours, paymentRecord };
+      return { 
+        sessionId: session.id,
+        hours, 
+        amount,
+        payment: paymentRecord,
+        start_time: session.start_time,
+        end_time: endTime
+      };
     });
 
     res.json({
-      message: "Parking session ended",
+      message: "Parking session ended successfully",
+      session_id: result.sessionId,
       duration_hours: result.hours,
-      payment: result.paymentRecord,
+      total_amount: result.amount,
+      payment: result.payment,
+      start_time: result.start_time,
+      end_time: result.end_time
     });
+    
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Error ending session:", error);
+    res.status(400).json({ 
+      message: error.message || "Failed to end session",
+      error: error.toString()
+    });
+  }
+};
+
+export const getMyActiveSession = async (req, res) => {
+  try {
+    console.log("Fetching active session for user ID:", req.user.id);
+    
+    const session = await parkingSession.findOne({
+      where: {
+        user_id: req.user.id,
+        end_time: null,
+      },
+      include: [
+        {
+          model: parkingSpace,
+          attributes: ["id", "name", "price_per_hour"], // REMOVE 'title' and 'price'
+        },
+      ],
+    });
+
+    console.log("Found session:", session ? "Yes" : "No");
+    
+    if (!session) {
+      return res.json(null); // Return null instead of empty object
+    }
+
+    // Format the response
+    const response = {
+      id: session.id,
+      start_time: session.start_time,
+      parking_id: session.parking_id,
+      user_id: session.user_id,
+      // Include parking space data
+      parkingSpace: session.parkingSpace ? {
+        id: session.parkingSpace.id,
+        name: session.parkingSpace.name,
+        price_per_hour: session.parkingSpace.price_per_hour,
+        // Don't include title and price since they don't exist
+      } : null
+    };
+
+    console.log("Returning session data:", response);
+    res.json(response);
+    
+  } catch (err) {
+    console.error("Error fetching active session:", err);
+    console.error("Error stack:", err.stack);
+    
+    res.status(500).json({ 
+      message: "Failed to fetch active session",
+      error: err.message,
+    });
   }
 };

@@ -19,14 +19,19 @@
   <a href="add-parking.html">Add Parking</a>
 
   <button id="findParkingBtn">Find Parking Near Me</button>
+  <input
+  type="text"
+  id="searchInput"
+  placeholder="Search location..."
+/>
+<button id="searchBtn">Search</button>
+
 
   <div id="map"></div>
   <div id="parking-list"></div>
 
-  <button id="endParkingBtn">
-    End Parking
-  </button>
   <a href="my-parking.html">My Parkings</a>
+  <a href="active-session.html"> View Active Session/a>
  <button onclick="logout()">Logout</button>
 
 
@@ -35,7 +40,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="./js/api.js"></script>
   <script src="./js/map.js"></script>
-  <script src="./js/session.js"></script>
+  <script src="./js/search.js"></script>
+  <script src="js/session.js"></script>
+
 
 </body>
 </html>

@@ -6,6 +6,18 @@ const PLATFORM_FEE_PERCENTAGE = 0.05; // 5%
 const Payment = sequelize.define("payment", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 
+  // ADD THIS MISSING FIELD:
+  session_id: { 
+    type: DataTypes.INTEGER, 
+    allowNull: false,  // Should be NOT NULL since it's a required foreign key
+    references: {
+      model: 'parkingSessions', // Make sure this matches your table name
+      key: 'id'
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  },
+
   amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
 
   platform_fee: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
@@ -24,6 +36,7 @@ const Payment = sequelize.define("payment", {
 
   paid_at: { type: DataTypes.DATE },
 });
+
 
 //
 // 🧠 INSTANCE METHOD: complete payment
