@@ -11,12 +11,31 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  is_verified: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true, // Always true since no verification
+  role: {
+    type: DataTypes.ENUM("admin", "user", "owner"),
+    defaultValue: "user",
+  },
+  verification_status: {
+    type: DataTypes.ENUM("pending", "verified", "suspended"),
+    defaultValue: "pending",
   },
   
-  // Removed verification_token and token_expires fields
+  // Owner-specific fields (optional)
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  
+  subscription_status: {
+    type: DataTypes.ENUM("inactive", "active", "expired"),
+    defaultValue: "inactive",
+  },
+  
+  subscription_expiry: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  }
+
 }, {
   timestamps: true,
 });

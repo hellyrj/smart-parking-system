@@ -42,7 +42,28 @@
   <script src="./js/map.js"></script>
   <script src="./js/search.js"></script>
   <script src="js/session.js"></script>
-
+<!-- Add this script at the top of home.html -->
+<script>
+// Check if user is logged in
+document.addEventListener("DOMContentLoaded", function() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/login.html";
+    }
+    
+    // Optional: Show user info
+    const userEmail = localStorage.getItem("userEmail");
+    const userRole = localStorage.getItem("userRole");
+    
+    if (userEmail) {
+        // You can display user info in the UI
+        const userInfoElement = document.getElementById("userInfo");
+        if (userInfoElement) {
+            userInfoElement.textContent = `Logged in as: ${userEmail} (${userRole})`;
+        }
+    }
+});
+</script>
 
 </body>
 </html>

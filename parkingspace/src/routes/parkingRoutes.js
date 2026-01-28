@@ -4,7 +4,7 @@ import { searchParking , createParking , getMyParkings , updateParking , deactiv
     deleteParking
 } from "../controllers/parkingController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
-
+import checkOwnerVerification from "../middleware/ownerVerificationMiddleware.js";
 
 const router = express.Router();
 
@@ -15,4 +15,5 @@ router.put("/:id", authMiddleware, updateParking);
 router.patch("/:id/deactivate", authMiddleware, deactivateParking);
 router.patch("/:id/activate", authMiddleware, activateParking);
 router.delete("/:id", authMiddleware, deleteParking);
+router.post("/",authMiddleware, checkOwnerVerification, createParking);
 export default router;

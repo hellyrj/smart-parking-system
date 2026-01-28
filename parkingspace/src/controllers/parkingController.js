@@ -21,6 +21,15 @@ export const createParking = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+       if (req.user.role !== "owner") {
+      // Auto-grant owner status when creating first parking
+      req.user.role = "owner";
+      req.user.verification_status = "pending"; // Needs admin verification
+      await req.user.save();
+      
+      console.log(`User ${req.user.id} became owner by creating parking`);
+    }
+
     // Distance in KM (0.02 km = 20 meters)
     const DISTANCE_LIMIT = 0.02;
 

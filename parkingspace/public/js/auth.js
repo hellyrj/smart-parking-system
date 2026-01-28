@@ -50,9 +50,17 @@ class Auth {
             if (data.token) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("userEmail", email);
+                localStorage.setItem("userRole", data.user.role);
+                localStorage.setItem("userId", data.user.id);
                 this.showAlert("Login successful!", "success");
                 setTimeout(() => {
-                    window.location.href = "/home.html";
+
+                    if (data.user.role === "admin") {
+                        window.location.href = "/admin.html";
+                    } else {
+                        window.location.href = "/home.html";
+                    }
+
                 }, 1000);
             } else {
                 this.showAlert(data.message || "Login failed", "error");
@@ -235,6 +243,8 @@ window.logout = function() {
     } else {
         localStorage.removeItem("token");
         localStorage.removeItem("userEmail");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("userId");
         window.location.href = "/home.html";
     }
 };

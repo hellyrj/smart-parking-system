@@ -4,7 +4,7 @@ import User from "../models/User.js";
 
 export const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role = "user" } = req.body;
 
     if (!email || !password)
       return res.status(400).json({ message: "Email and password required" });
@@ -18,14 +18,20 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
    
-    await User.create({
+    const user = await User.create({
       email,
       password: hashedPassword,
-      is_verified: true, // Automatically verified without email verification
+      role: role,
+      verification_status: "verified"
     });
 
     res.status(201).json({
       message: "Registration successful. You can now login.",
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      }
     });
   } catch (err) {
     console.error(err);
@@ -50,15 +56,27 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { 
-        id: user.id
+        id: user.id,
+        email: user.email,
+        role: user.role
         
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+      res.json({ 
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        verification_status: user.verification_status
+      }
+    });
+   
   } catch (err) {
+    console.error("login error", err);
     res.status(500).json({ message: "Login failed" });
   }
 };

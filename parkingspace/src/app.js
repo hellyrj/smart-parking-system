@@ -3,6 +3,8 @@ import express from "express";
 import authRoutes from "./routes/authRoutes.js";
 import parkingRoutes from "./routes/parkingRoutes.js";
 import parkingSessionRoutes from "./routes/parkingSessionRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -19,7 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 // ================= API ROUTES =================
 app.use("/api/auth", authRoutes);
 app.use("/api/parking", parkingRoutes);
-app.use("/api/sessions" , parkingSessionRoutes)
+app.use("/api/sessions" , parkingSessionRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 // API 404 (JSON ONLY)
 app.use("/api", (req, res) => {

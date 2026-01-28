@@ -15,6 +15,11 @@ const ParkingSpace = sequelize.define("parkingSpace", {
   price_per_hour: { type: DataTypes.DECIMAL(8, 2), allowNull: false },
 
   is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
+  approval_status: {
+  type: DataTypes.ENUM("pending", "approved", "rejected"),
+  defaultValue: "pending"
+}
+
 });
 
 ParkingSpace.prototype.occupySpot = async function (transaction) {

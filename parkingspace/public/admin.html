@@ -1,0 +1,276 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Admin Dashboard</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/admin.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-parking"></i>
+                    <span>Parking Admin</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="admin-info">
+                    <span id="adminEmail">admin@example.com</span>
+                    <button onclick="logout()" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </li>
+                <li data-section="users">
+                    <i class="fas fa-users"></i> User Management
+                </li>
+                <li data-section="owners">
+                    <i class="fas fa-user-tie"></i> Owner Verification
+                </li>
+                <li data-section="documents">
+                    <i class="fas fa-file-alt"></i> Document Review
+                </li>
+                <li data-section="parkings">
+                    <i class="fas fa-car"></i> Parking Spaces
+                </li>
+                <li data-section="payments">
+                    <i class="fas fa-credit-card"></i> Payments
+                </li>
+                <li data-section="activity">
+                    <i class="fas fa-history"></i> Activity Log
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+                <div class="stats-grid" id="dashboardStats">
+                    <!-- Stats will be loaded here -->
+                </div>
+                
+                <div class="dashboard-content">
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-line"></i> Recent Activity</h3>
+                        <div class="activity-list" id="recentActivity">
+                            <!-- Activity will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                        <div class="actions-grid">
+                            <button class="action-btn" onclick="showSection('users')">
+                                <i class="fas fa-users"></i>
+                                <span>Manage Users</span>
+                            </button>
+                            <button class="action-btn" onclick="showSection('owners')">
+                                <i class="fas fa-user-check"></i>
+                                <span>Verify Owners</span>
+                            </button>
+                            <button class="action-btn" onclick="showSection('documents')">
+                                <i class="fas fa-file-upload"></i>
+                                <span>Review Documents</span>
+                            </button>
+                            <button class="action-btn" onclick="showSection('parkings')">
+                                <i class="fas fa-car"></i>
+                                <span>Approve Parkings</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Management Section -->
+            <section id="users" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> User Management</h2>
+                    <div class="header-actions">
+                        <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                        <select id="userFilter" class="filter-select">
+                            <option value="all">All Users</option>
+                            <option value="user">Regular Users</option>
+                            <option value="owner">Owners</option>
+                            <option value="admin">Admins</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Subscription</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="usersPagination"></div>
+            </section>
+
+            <!-- Owner Verification Section -->
+            <section id="owners" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-tie"></i> Owner Verification</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Verification Status</th>
+                                <th>Parking Spaces</th>
+                                <th>Documents</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ownersTable">
+                            <!-- Owners will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Document Review Section -->
+            <section id="documents" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-alt"></i> Document Review</h2>
+                    <select id="documentFilter" class="filter-select">
+                        <option value="pending">Pending Review</option>
+                        <option value="all">All Documents</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="documents-grid" id="documentsGrid">
+                    <!-- Documents will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Parking Spaces Section -->
+            <section id="parkings" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-car"></i> Parking Space Management</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Owner</th>
+                                <th>Location</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Approval</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parkingsTable">
+                            <!-- Parkings will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section id="payments" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-credit-card"></i> Payment Verification</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTable">
+                            <!-- Payments will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Activity Log Section -->
+            <section id="activity" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Activity Log</h2>
+                </div>
+                <div class="activity-log" id="activityLog">
+                    <!-- Activity log will be loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">User Details</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-actions">
+                <button id="confirmCancel" class="btn btn-secondary">Cancel</button>
+                <button id="confirmAction" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="adminLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="adminAlertContainer"></div>
+
+    <script src="./js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="./js/admin.js"></script>
+</body>
+</html>
