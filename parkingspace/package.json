@@ -27,7 +27,8 @@
     "nodemailer": "^7.0.12",
     "resend": "^6.4.2",
     "sequelize": "^6.37.7",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

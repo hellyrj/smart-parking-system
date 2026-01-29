@@ -68,6 +68,13 @@
     id="city"
     placeholder="City (optional)"
   />
+  <!-- Add these to your add-parking.html form -->
+   <label for="parkingImages">Parking Images (Multiple, max 10):</label>
+<input type="file" id="parkingImages" multiple accept="image/*" placeholder="Parking Images">
+  <label for="legalDocument">Legal Document (PDF):</label>
+<input type="file" id="legalDocument" accept=".pdf,.doc,.docx" placeholder="Legal Document">
+<label for="paymentProof">Payment Proof (Screenshot):</label>
+<input type="file" id="paymentProof" accept="image/*" placeholder="Payment Proof">
 
   <button type="submit">Save Parking</button>
 </form>
