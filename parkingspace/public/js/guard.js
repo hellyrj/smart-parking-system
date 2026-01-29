@@ -1,4 +1,3 @@
-// guard.js - Improved Authentication Guard
 (function () {
     const token = localStorage.getItem("token");
     
@@ -8,7 +7,6 @@
         return;
     }
 
-    // Validate token (basic check)
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         
@@ -20,10 +18,24 @@
             return;
         }
         
-        // Optional: Add user info to window for easy access
+        // Check if user is verified (for owner routes)
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('owner') && payload.role === 'owner' && payload.verification_status !== 'verified') {
+            window.location.href = "/home.html?error=Owner verification required";
+            return;
+        }
+        
+        // Check if user is admin (for admin routes)
+        if (currentPath.includes('admin') && payload.role !== 'admin') {
+            window.location.href = "/home.html?error=Admin access required";
+            return;
+        }
+        
         window.user = {
             id: payload.id,
-            email: localStorage.getItem("userEmail")
+            email: payload.email,
+            role: payload.role,
+            verification_status: payload.verification_status
         };
         
     } catch (error) {

@@ -19,6 +19,32 @@
 
   <script src="./js/api.js"></script>
   <script src="./js/myParkings.js"></script>
-
+     <script>
+      // In my-parking.html or a new reservations.html
+async function loadReservations() {
+    try {
+        const sessions = await API.getDriverSessions();
+        const reservations = Array.isArray(sessions) ? 
+            sessions.filter(s => !s.end_time && s.status === 'reserved') : 
+            [];
+        
+        // Display reservations with "Start Session" buttons
+        reservations.forEach(reservation => {
+            // Create UI element with start button
+            const button = document.createElement('button');
+            button.textContent = 'Start Session';
+            button.onclick = async () => {
+                const result = await API.startParkingSession(reservation.reservation_id || reservation.id);
+                if (result.success) {
+                    window.location.href = 'active-session.html';
+                }
+            };
+            // Add to DOM
+        });
+    } catch (error) {
+        console.error("Error loading reservations:", error);
+    }
+}
+    </script>
 </body>
 </html>

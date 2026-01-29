@@ -13,7 +13,10 @@ import {
   approveParkingSpace,
   rejectParkingSpace,
   verifyPayment,
-  getDashboardStats
+  getDashboardStats,
+    getAllPaymentProofs,
+  verifyPaymentProof,
+  rejectPaymentProof
 } from "../controllers/adminController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
@@ -49,5 +52,10 @@ router.post("/payments/:id/verify", verifyPayment);
 
 // Dashboard Stats
 router.get("/dashboard", getDashboardStats);
+
+//payment proof
+router.get("/payment-proofs", getAllPaymentProofs);
+router.post("/payment-proofs/:id/verify", verifyPaymentProof);
+router.post("/payment-proofs/:id/reject", rejectPaymentProof);
 
 export default router;

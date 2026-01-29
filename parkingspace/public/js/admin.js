@@ -198,6 +198,268 @@ class AdminDashboard {
         `).join("");
     }
 
+    // In admin.js - ADD payment proof methods:
+async loadPayments() {
+  try {
+    this.showLoading(true);
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    
+    if (!response.ok) throw new Error("Failed to load payment proofs");
+    
+    const paymentProofs = await response.json();
+    this.renderPaymentsTable(paymentProofs);
+  } catch (error) {
+    this.showAlert("Failed to load payments: " + error.message, "error");
+    this.renderPaymentsTable([]);
+  } finally {
+    this.showLoading(false);
+  }
+}
+
+renderPaymentsTable(paymentProofs) {
+  const tbody = document.getElementById("paymentsTable");
+  
+  if (!paymentProofs || paymentProofs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No pending payments</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = paymentProofs.map(payment => `
+    <tr>
+      <td>${payment.id}</td>
+      <td>${payment.user?.email || 'N/A'}</td>
+      <td>$${payment.amount}</td>
+      <td>
+        <span class="status-badge ${payment.payment_type === 'subscription' ? 'status-info' : 'status-warning'}">
+          ${payment.payment_type}
+        </span>
+      </td>
+      <td>
+        <span class="status-badge ${payment.status === 'pending' ? 'status-pending' : 
+          payment.status === 'verified' ? 'status-verified' : 'status-suspended'}">
+          ${payment.status}
+        </span>
+      </td>
+      <td>${new Date(payment.createdAt).toLocaleDateString()}</td>
+      <td>
+        <button class="btn-action btn-view" onclick="admin.viewPaymentProof(${payment.id})">
+          <i class="fas fa-eye"></i> View Screenshot
+        </button>
+      </td>
+      <td>
+        ${payment.status === 'pending' ? `
+          <button class="btn-action btn-approve" onclick="admin.verifyPaymentProof(${payment.id})">
+            <i class="fas fa-check"></i> Verify
+          </button>
+          <button class="btn-action btn-reject" onclick="admin.rejectPaymentProof(${payment.id})">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join("");
+}
+
+async viewPaymentProof(paymentId) {
+  try {
+    // Get payment proof details
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    
+    if (!response.ok) throw new Error("Failed to load payment proof");
+    
+    const paymentProofs = await response.json();
+    const payment = paymentProofs.find(p => p.id == paymentId);
+    
+    if (payment) {
+      // Open payment proof in new tab
+      window.open(payment.file_url, '_blank');
+    }
+  } catch (error) {
+    this.showAlert("Failed to view payment proof: " + error.message, "error");
+  }
+}
+
+async verifyPaymentProof(paymentId) {
+  const notes = prompt("Enter verification notes (optional):");
+  
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs/${paymentId}/verify`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ notes })
+    });
+    
+    if (!response.ok) throw new Error("Failed to verify payment");
+    
+    const result = await response.json();
+    this.showAlert(result.message || "Payment verified successfully", "success");
+    this.loadPayments();
+    this.loadDashboard(); // Refresh stats
+  } catch (error) {
+    this.showAlert("Failed to verify payment: " + error.message, "error");
+  }
+}
+
+async rejectPaymentProof(paymentId) {
+  const reason = prompt("Enter rejection reason:");
+  if (!reason) return;
+  
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs/${paymentId}/reject`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ reason })
+    });
+    
+    if (!response.ok) throw new Error("Failed to reject payment");
+    
+    const result = await response.json();
+    this.showAlert(result.message || "Payment rejected", "success");
+    this.loadPayments();
+  } catch (error) {
+    this.showAlert("Failed to reject payment: " + error.message, "error");
+  }
+}
+
+renderPaymentsTable(paymentProofs) {
+  const tbody = document.getElementById("paymentsTable");
+  
+  if (!paymentProofs || paymentProofs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No pending payments</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = paymentProofs.map(payment => `
+    <tr>
+      <td>${payment.id}</td>
+      <td>${payment.user?.email || 'N/A'}</td>
+      <td>$${payment.amount}</td>
+      <td>
+        <span class="status-badge ${payment.payment_type === 'subscription' ? 'status-info' : 'status-warning'}">
+          ${payment.payment_type}
+        </span>
+      </td>
+      <td>
+        <span class="status-badge ${payment.status === 'pending' ? 'status-pending' : 
+          payment.status === 'verified' ? 'status-verified' : 'status-suspended'}">
+          ${payment.status}
+        </span>
+      </td>
+      <td>${new Date(payment.createdAt).toLocaleDateString()}</td>
+      <td>
+        <button class="btn-action btn-view" onclick="admin.viewPaymentProof(${payment.id})">
+          <i class="fas fa-eye"></i> View Screenshot
+        </button>
+      </td>
+      <td>
+        ${payment.status === 'pending' ? `
+          <button class="btn-action btn-approve" onclick="admin.verifyPaymentProof(${payment.id})">
+            <i class="fas fa-check"></i> Verify
+          </button>
+          <button class="btn-action btn-reject" onclick="admin.rejectPaymentProof(${payment.id})">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join("");
+}
+
+async viewPaymentProof(paymentId) {
+  try {
+    // Get payment proof details
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    
+    if (!response.ok) throw new Error("Failed to load payment proof");
+    
+    const paymentProofs = await response.json();
+    const payment = paymentProofs.find(p => p.id == paymentId);
+    
+    if (payment) {
+      // Open payment proof in new tab
+      window.open(payment.file_url, '_blank');
+    }
+  } catch (error) {
+    this.showAlert("Failed to view payment proof: " + error.message, "error");
+  }
+}
+
+async verifyPaymentProof(paymentId) {
+  const notes = prompt("Enter verification notes (optional):");
+  
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs/${paymentId}/verify`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ notes })
+    });
+    
+    if (!response.ok) throw new Error("Failed to verify payment");
+    
+    const result = await response.json();
+    this.showAlert(result.message || "Payment verified successfully", "success");
+    this.loadPayments();
+    this.loadDashboard(); // Refresh stats
+  } catch (error) {
+    this.showAlert("Failed to verify payment: " + error.message, "error");
+  }
+}
+
+async rejectPaymentProof(paymentId) {
+  const reason = prompt("Enter rejection reason:");
+  if (!reason) return;
+  
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${window.API_BASE}/admin/payment-proofs/${paymentId}/reject`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ reason })
+    });
+    
+    if (!response.ok) throw new Error("Failed to reject payment");
+    
+    const result = await response.json();
+    this.showAlert(result.message || "Payment rejected", "success");
+    this.loadPayments();
+  } catch (error) {
+    this.showAlert("Failed to reject payment: " + error.message, "error");
+  }
+}
+
     showSection(sectionId) {
         // Hide all sections
         document.querySelectorAll(".content-section").forEach(section => {
@@ -344,17 +606,42 @@ class AdminDashboard {
         `).join("");
     }
 
-    async loadDocuments(filter = "pending") {
-        try {
-            this.showLoading(true);
-            const users = await API.getAdminUsers();
-            this.renderDocumentsGrid(users, filter);
-        } catch (error) {
-            this.showAlert("Failed to load documents: " + error.message, "error");
-        } finally {
-            this.showLoading(false);
-        }
+async loadDocuments(filter = "pending") {
+  try {
+    this.showLoading(true);
+    // First, get all users to filter by owners
+    const users = await API.getAdminUsers();
+    
+    // Filter to get only owner users
+    const ownerUsers = users.filter(user => user.role === 'owner' || user.verification_status === 'pending');
+    
+    // Collect all documents from owner users
+    let allDocuments = [];
+    for (const user of ownerUsers) {
+      const documents = await API.getUserDocuments(user.id);
+      if (documents && documents.length > 0) {
+        documents.forEach(doc => {
+          allDocuments.push({
+            ...doc,
+            userEmail: user.email,
+            userId: user.id
+          });
+        });
+      }
     }
+
+    // Filter documents
+    if (filter !== "all") {
+      allDocuments = allDocuments.filter(doc => doc.status === filter);
+    }
+
+    this.renderDocumentsGrid(allDocuments, filter);
+  } catch (error) {
+    this.showAlert("Failed to load documents: " + error.message, "error");
+  } finally {
+    this.showLoading(false);
+  }
+}
 
     renderDocumentsGrid(users, filter) {
         const grid = document.getElementById("documentsGrid");

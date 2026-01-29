@@ -270,59 +270,79 @@ moveToLocation(lat, lng, displayName = "Searched Location") {
             });
         }
     }
+// In handleSubmit function, replace the data submission:
 
-    async handleSubmit(e) {
-        e.preventDefault();
+async  handleSubmit(e) {
+    e.preventDefault();
 
-        if (!this.selectedLatLng) {
-            this.showAlert("Please select a location on the map", "error");
-            return;
-        }
-
-        // Validate form
-        if (!this.validateForm()) return;
-
-        const data = {
-            name: document.getElementById("name").value,
-            description: document.getElementById("description").value,
-            total_spots: Number(document.getElementById("totalSpots").value),
-            price_per_hour: Number(document.getElementById("price").value),
-            latitude: this.selectedLatLng.lat,
-            longitude: this.selectedLatLng.lng,
-            address: document.getElementById("address").value,
-            city: document.getElementById("city").value,
-        };
-
-        // Show loading
-        this.showLoading(true);
-
-        try {
-            let res;
-            
-            if (this.isEditMode) {
-                res = await API.updateParking(this.editId, data);
-            } else {
-                res = await API.createParking(data);
-            }
-
-            if (res.message === "A parking spot already exists at this location") {
-                this.showAlert("⚠️ A parking spot already exists at this location! Please choose another location.", "warning");
-            } else if (res.message.includes("successfully")) {
-                this.showAlert(`✅ ${res.message}`, "success");
-                setTimeout(() => {
-                    window.location.href = "/my-parkings.html"; // Redirect to my parkings page
-                }, 1500);
-            } else {
-                this.showAlert(res.message || "Operation failed", "error");
-            }
-        } catch (err) {
-            console.error("Submit error:", err);
-            this.showAlert("Something went wrong. Please try again.", "error");
-        } finally {
-            this.showLoading(false);
-        }
+    if (!this.selectedLatLng) {
+        this.showAlert("Please select a location on the map", "error");
+        return;
     }
 
+    // Validate form
+    if (!this.validateForm()) return;
+
+    // Create FormData for file uploads
+    const formData = new FormData();
+    
+    // Add form fields
+    formData.append('name', document.getElementById("name").value);
+    formData.append('description', document.getElementById("description").value);
+    formData.append('total_spots', Number(document.getElementById("totalSpots").value));
+    formData.append('price_per_hour', Number(document.getElementById("price").value));
+    formData.append('latitude', this.selectedLatLng.lat);
+    formData.append('longitude', this.selectedLatLng.lng);
+    formData.append('address', document.getElementById("address").value);
+    formData.append('city', document.getElementById("city").value);
+
+    // For file uploads, you'll need to add file input elements to your HTML
+    // Example: <input type="file" id="parkingImages" multiple>
+    // <input type="file" id="legalDocument">
+    // <input type="file" id="paymentProof">
+
+    // Show loading
+    this.showLoading(true);
+
+    try {
+        let res;
+        
+        if (this.isEditMode) {
+            // For edit mode, use regular JSON (no file upload)
+            const data = {
+                name: document.getElementById("name").value,
+                description: document.getElementById("description").value,
+                total_spots: Number(document.getElementById("totalSpots").value),
+                price_per_hour: Number(document.getElementById("price").value),
+                latitude: this.selectedLatLng.lat,
+                longitude: this.selectedLatLng.lng,
+                address: document.getElementById("address").value,
+                city: document.getElementById("city").value,
+            };
+            
+            res = await API.updateParking(this.editId, data);
+        } else {
+            // For create mode, use FormData
+            res = await API.createParking(formData);
+        }
+
+        if (res.message === "A parking spot already exists at this location") {
+            this.showAlert("⚠️ A parking spot already exists at this location! Please choose another location.", "warning");
+        } else if (res.message.includes("successfully")) {
+            this.showAlert(`✅ ${res.message}`, "success");
+            setTimeout(() => {
+                window.location.href = "/my-parkings.html";
+            }, 1500);
+        } else {
+            this.showAlert(res.message || "Operation failed", "error");
+        }
+    } catch (err) {
+        console.error("Submit error:", err);
+        this.showAlert("Something went wrong. Please try again.", "error");
+    } finally {
+        this.showLoading(false);
+    }
+}
     validateForm() {
         const name = document.getElementById("name").value.trim();
         const totalSpots = document.getElementById("totalSpots").value;

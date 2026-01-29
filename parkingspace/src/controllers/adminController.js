@@ -5,7 +5,8 @@ import {
   parkingSpace,
   payment,
   parkingSession,
-  activityLog
+  activityLog,
+  PaymentProof
 } from "../models/index.js";
 
 // User Management (now includes owners)
@@ -474,5 +475,103 @@ export const getDashboardStats = async (req, res) => {
       message: "Failed to fetch dashboard stats",
       error: error.message 
     });
+  }
+};
+
+// In adminController.js - ADD these new functions for payment management:
+
+// Get all payment proofs for verification
+export const getAllPaymentProofs = async (req, res) => {
+  try {
+    const paymentProofs = await PaymentProof.findAll({
+      where: { status: 'pending' },
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['id', 'email', 'name']
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(paymentProofs);
+  } catch (error) {
+    console.error("Error fetching payment proofs:", error);
+    res.status(500).json({ message: "Failed to fetch payment proofs" });
+  }
+};
+
+// Verify payment proof with screenshot
+export const verifyPaymentProof = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+    
+    const paymentProof = await PaymentProof.findByPk(id);
+    if (!paymentProof) {
+      return res.status(404).json({ message: "Payment proof not found" });
+    }
+    
+    paymentProof.status = "verified";
+    paymentProof.verified_by = req.user.id;
+    paymentProof.verified_at = new Date();
+    paymentProof.notes = notes;
+    await paymentProof.save();
+    
+    // If this is a subscription payment, update user subscription
+    if (paymentProof.payment_type === 'subscription') {
+      const user = await User.findByPk(paymentProof.user_id);
+      if (user) {
+        user.subscription_status = 'active';
+        user.subscription_expiry = new Date();
+        user.subscription_expiry.setMonth(user.subscription_expiry.getMonth() + 1); // 1 month
+        await user.save();
+      }
+    }
+    
+    await activityLog.create({
+      user_id: req.user.id,
+      action: `Verified payment proof for ${paymentProof.payment_type}`,
+      target_user_id: paymentProof.user_id
+    });
+    
+    res.json({ 
+      message: "Payment proof verified successfully",
+      paymentProof
+    });
+  } catch (error) {
+    console.error("Error verifying payment proof:", error);
+    res.status(500).json({ message: "Failed to verify payment proof" });
+  }
+};
+
+// Reject payment proof
+export const rejectPaymentProof = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    const paymentProof = await PaymentProof.findByPk(id);
+    if (!paymentProof) {
+      return res.status(404).json({ message: "Payment proof not found" });
+    }
+    
+    paymentProof.status = "rejected";
+    paymentProof.verified_by = req.user.id;
+    paymentProof.verified_at = new Date();
+    paymentProof.notes = reason;
+    await paymentProof.save();
+    
+    await activityLog.create({
+      user_id: req.user.id,
+      action: `Rejected payment proof: ${reason}`,
+      target_user_id: paymentProof.user_id
+    });
+    
+    res.json({ 
+      message: "Payment proof rejected",
+      paymentProof
+    });
+  } catch (error) {
+    console.error("Error rejecting payment proof:", error);
+    res.status(500).json({ message: "Failed to reject payment proof" });
   }
 };

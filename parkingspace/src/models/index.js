@@ -8,6 +8,8 @@ import payment from "./payment.js";
 import review from "./review.js";
 import activityLog from "./activityLog.js";
 import UserDocument from "./userDocument.js";
+import PaymentProof from "./paymentProof.js";
+import notification from "./notification.js";
 
 // User relations
 User.hasMany(parkingSpace, { 
@@ -19,6 +21,18 @@ parkingSpace.belongsTo(User, {
   as: "owner"
 });
 
+User.hasMany(PaymentProof, { 
+  foreignKey: "user_id",
+  as: "paymentProofs"
+});
+PaymentProof.belongsTo(User, { 
+  foreignKey: "user_id",
+  as: "user"
+});
+
+User.hasMany(notification, { foreignKey: "user_id" });
+notification.belongsTo(User, { foreignKey: "user_id" });
+
 // User documents
 User.hasMany(UserDocument, { 
   foreignKey: "user_id",
@@ -28,6 +42,7 @@ UserDocument.belongsTo(User, {
   foreignKey: "user_id",
   as: "user"
 });
+
 
 
 // Parking relations
@@ -70,5 +85,7 @@ export {
   parkingSession,
   payment,
   review,
-  activityLog
+  activityLog,
+  PaymentProof,
+  notification
 };
