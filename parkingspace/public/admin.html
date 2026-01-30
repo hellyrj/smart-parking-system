@@ -1,6 +1,5 @@
-<!-- admin.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,17 +8,25 @@
     <link rel="stylesheet" href="./css/admin.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Admin Navigation -->
     <nav class="admin-nav">
         <div class="nav-container">
             <div class="nav-left">
-                <div class="logo">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="#" class="logo">
                     <i class="fas fa-parking"></i>
-                    <span>Parking Admin</span>
-                </div>
+                    <span>EchoPark Admin</span>
+                </a>
             </div>
             <div class="nav-right">
+                <button class="admin-theme-toggle" id="adminThemeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
                 <div class="admin-info">
                     <span id="adminEmail">admin@example.com</span>
                     <button onclick="logout()" class="btn-logout">
@@ -32,7 +39,7 @@
 
     <div class="admin-container">
         <!-- Sidebar -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="adminSidebar">
             <ul class="sidebar-menu">
                 <li class="active" data-section="dashboard">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -209,14 +216,14 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                  <th>ID</th>
-      <th>User</th>
-      <th>Amount</th>
-      <th>Type</th>
-      <th>Status</th>
-      <th>Date</th>
-      <th>Screenshot</th>
-      <th>Actions</th>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Screenshot</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="paymentsTable">
@@ -270,8 +277,131 @@
     <!-- Alert Container -->
     <div id="adminAlertContainer"></div>
 
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
+
     <script src="./js/auth.js"></script>
     <script src="js/api.js"></script>
     <script src="./js/admin.js"></script>
-</body>
+    <script src="js/common.js"></script>
+    
+    <script>
+        // Admin specific theme toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminThemeToggle = document.getElementById('adminThemeToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const adminSidebar = document.getElementById('adminSidebar');
+            
+            // Theme Toggle
+            if (adminThemeToggle) {
+                const theme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                
+                adminThemeToggle.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    
+                    // Add animation effect
+                    adminThemeToggle.style.transform = 'rotate(360deg)';
+                    setTimeout(() => {
+                        adminThemeToggle.style.transform = '';
+                    }, 300);
+                });
+            }
+            
+            // Mobile sidebar toggle
+            if (sidebarToggle && adminSidebar) {
+                sidebarToggle.addEventListener('click', () => {
+                    adminSidebar.classList.toggle('active');
+                });
+                
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', (event) => {
+                    if (window.innerWidth <= 768) {
+                        if (!adminSidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                            adminSidebar.classList.remove('active');
+                        }
+                    }
+                });
+            }
+            
+            // Section switching
+            const menuItems = document.querySelectorAll('.sidebar-menu li');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove active class from all items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    item.classList.add('active');
+                    
+                    // Hide all sections
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show selected section
+                    const sectionId = item.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.add('active');
+                    
+                    // Close sidebar on mobile
+                    if (window.innerWidth <= 768) {
+                        adminSidebar.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>  
 </html>

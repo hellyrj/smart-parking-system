@@ -5,395 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard - Smart Parking</title>
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/owner-dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .owner-dashboard {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        
-        .dashboard-title h1 {
-            color: #333;
-            margin: 0;
-        }
-        
-        .dashboard-title p {
-            color: #666;
-            margin: 5px 0 0 0;
-        }
-        
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-        
-        .stat-info h3 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-        
-        .stat-info p {
-            margin: 5px 0 0 0;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .dashboard-sections {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        
-        .section-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .section-header h2 {
-            margin: 0;
-            color: #333;
-            font-size: 20px;
-        }
-        
-        .section-header h2 i {
-            margin-right: 10px;
-            color: #667eea;
-        }
-        
-        .refresh-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-        }
-        
-        .refresh-btn:hover {
-            background: #5a67d8;
-        }
-        
-        .session-list, .reservation-list, .parking-list {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .session-item, .reservation-item, .parking-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid;
-            transition: transform 0.2s;
-        }
-        
-        .session-item:hover, .reservation-item:hover, .parking-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .session-item.active {
-            border-left-color: #28a745;
-        }
-        
-        .session-item.reserved {
-            border-left-color: #ffc107;
-        }
-        
-        .session-header, .reservation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .session-title, .reservation-title {
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        .session-badge, .reservation-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .badge-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .badge-reserved {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .session-details, .reservation-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .detail-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 3px;
-        }
-        
-        .detail-value {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .session-actions, .reservation-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s;
-        }
-        
-        .btn-confirm {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-confirm:hover {
-            background: #218838;
-        }
-        
-        .btn-cancel {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-cancel:hover {
-            background: #c82333;
-        }
-        
-        .btn-view {
-            background: #17a2b8;
-            color: white;
-        }
-        
-        .btn-view:hover {
-            background: #138496;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        
-        .no-data i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-        
-        .parking-item {
-            border-left-color: #667eea;
-        }
-        
-        .parking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .parking-title {
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        .parking-status {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .parking-details {
-            margin-bottom: 15px;
-        }
-        
-        .parking-detail {
-            margin: 5px 0;
-            color: #555;
-        }
-        
-        .parking-sessions {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #ddd;
-        }
-        
-        .sessions-count {
-            font-size: 14px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .sessions-count i {
-            color: #667eea;
-        }
-        
-        .earnings-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .earnings-card .stat-info h3,
-        .earnings-card .stat-info p {
-            color: white;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .notification.show {
-            display: flex;
-        }
-        
-        .notification.success {
-            border-left: 4px solid #28a745;
-        }
-        
-        .notification.error {
-            border-left: 4px solid #dc3545;
-        }
-        
-        .notification.info {
-            border-left: 4px solid #17a2b8;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
+
 </head>
+
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
+        </div>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html" class="active">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
 <body>
+    
     <div class="owner-dashboard">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
@@ -507,386 +180,64 @@
     
     <!-- Notification Toast -->
     <div class="notification" id="notification"></div>
+
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
     
     <script src="./js/api.js"></script>
     <script src="./js/auth.js"></script>
-    <script>
-        // Global logout function
-        function logout() {
-            if (window.auth && window.auth.logout) {
-                window.auth.logout();
-            } else {
-                localStorage.removeItem("token");
-                localStorage.removeItem("userEmail");
-                localStorage.removeItem("userRole");
-                window.location.href = "/home.html";
-            }
-        }
-        
-        // Show notification
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(amount);
-        }
-        
-        // Format date/time
-        function formatDateTime(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        // Calculate time difference
-        function timeSince(startTime) {
-            const start = new Date(startTime);
-            const now = new Date();
-            const diffMs = now - start;
-            const diffMins = Math.floor(diffMs / (1000 * 60));
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            
-            if (diffHours > 0) {
-                return `${diffHours}h ${diffMins % 60}m`;
-            }
-            return `${diffMins}m`;
-        }
-        
-        // Load dashboard data
-        async function loadDashboard() {
-            try {
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('dashboardContent').style.display = 'none';
-                
-                // Load all data in parallel
-                const [parkings, activeSessions, reservations, earnings] = await Promise.all([
-                    API.getMyParkings(),
-                    API.getOwnerActiveSessions(),
-                    API.getOwnerReservations(),
-                    API.getOwnerEarnings()
-                ]);
-                
-                // Update stats
-                document.getElementById('totalParkings').textContent = Array.isArray(parkings) ? parkings.length : 0;
-                document.getElementById('activeSessions').textContent = Array.isArray(activeSessions) ? activeSessions.length : 0;
-                document.getElementById('pendingReservations').textContent = Array.isArray(reservations) ? reservations.length : 0;
-                document.getElementById('todayEarnings').textContent = earnings.today_earnings || '$0.00';
-                
-                // Render data
-                renderParkings(parkings);
-                renderActiveSessions(activeSessions);
-                renderReservations(reservations);
-                
-                // Show content
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-                showNotification('Failed to load dashboard data', 'error');
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-        
-        // Render parking spaces
-        function renderParkings(parkings) {
-            const container = document.getElementById('parkingsList');
-            
-            if (!parkings || !Array.isArray(parkings) || parkings.length === 0) {
-                container.innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-parking"></i>
-                        <p>No parking spaces found</p>
-                        <button onclick="window.location.href='/add-parking.html'" class="refresh-btn" style="margin-top: 10px;">
-                            Add Parking Space
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = parkings.map(parking => `
-                <div class="parking-item">
-                    <div class="parking-header">
-                        <div class="parking-title">${parking.name}</div>
-                        <div class="parking-status ${parking.is_active ? 'status-active' : 'status-inactive'}">
-                            ${parking.is_active ? 'Active' : 'Inactive'}
-                        </div>
-                    </div>
-                    <div class="parking-details">
-                        <div class="parking-detail">
-                            <strong>Location:</strong> ${parking.parkingLocation?.address || 'N/A'}, ${parking.parkingLocation?.city || ''}
-                        </div>
-                        <div class="parking-detail">
-                            <strong>Spots:</strong> ${parking.available_spots || 0}/${parking.total_spots} available
-                        </div>
-                        <div class="parking-detail">
-                            <strong>Price:</strong> $${parking.price_per_hour}/hour
-                        </div>
-                    </div>
-                    <div class="parking-sessions">
-                        <div class="sessions-count">
-                            <i class="fas fa-users"></i>
-                            <span>View sessions for this parking</span>
-                        </div>
-                        <div class="session-actions" style="margin-top: 10px;">
-                            <button class="action-btn btn-view" onclick="viewParkingSessions(${parking.id})">
-                                <i class="fas fa-eye"></i> View Sessions
-                            </button>
-                            <button class="action-btn" onclick="window.location.href='/add-parking.html?edit=${parking.id}'" style="background: #ffc107; color: #856404;">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // Render active sessions
-        function renderActiveSessions(sessions) {
-            const container = document.getElementById('activeSessionsList');
-            
-            if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
-                container.innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-play-circle"></i>
-                        <p>No active sessions</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = sessions.map(session => `
-                <div class="session-item ${session.session_type}">
-                    <div class="session-header">
-                        <div class="session-title">${session.parking_name || 'Unknown Parking'}</div>
-                        <div class="session-badge ${session.session_type === 'active' ? 'badge-active' : 'badge-reserved'}">
-                            ${session.session_type === 'active' ? 'ACTIVE' : 'RESERVED'}
-                        </div>
-                    </div>
-                    <div class="session-details">
-                        <div class="detail-item">
-                            <span class="detail-label">User</span>
-                            <span class="detail-value">${session.user_email || 'Unknown User'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Start Time</span>
-                            <span class="detail-value">${formatDateTime(session.start_time)}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Duration</span>
-                            <span class="detail-value">${timeSince(session.start_time)}</span>
-                        </div>
-                        ${session.current_cost ? `
-                            <div class="detail-item">
-                                <span class="detail-label">Current Cost</span>
-                                <span class="detail-value">$${session.current_cost}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="session-actions">
-                        ${session.session_type === 'reserved' ? `
-                            <button class="action-btn btn-confirm" onclick="confirmArrival(${session.id})">
-                                <i class="fas fa-check"></i> Confirm Arrival
-                            </button>
-                        ` : ''}
-                        <button class="action-btn btn-view" onclick="viewSessionDetails(${session.id})">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                        <button class="action-btn btn-cancel" onclick="cancelSession(${session.id})">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // Render reservations
-        function renderReservations(reservations) {
-            const container = document.getElementById('reservationsList');
-            
-            if (!reservations || !Array.isArray(reservations) || reservations.length === 0) {
-                container.innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-clock"></i>
-                        <p>No pending reservations</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = reservations.map(reservation => `
-                <div class="reservation-item">
-                    <div class="reservation-header">
-                        <div class="reservation-title">${reservation.parking_name || 'Unknown Parking'}</div>
-                        <div class="reservation-badge badge-reserved">
-                            RESERVED
-                        </div>
-                    </div>
-                    <div class="reservation-details">
-                        <div class="detail-item">
-                            <span class="detail-label">User</span>
-                            <span class="detail-value">${reservation.user_email || 'Unknown User'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Vehicle</span>
-                            <span class="detail-value">${reservation.vehicle_plate || 'N/A'} - ${reservation.vehicle_model || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Reserved Until</span>
-                            <span class="detail-value">${formatDateTime(reservation.reserved_until)}</span>
-                        </div>
-                        ${reservation.expires_in_minutes ? `
-                            <div class="detail-item">
-                                <span class="detail-label">Expires In</span>
-                                <span class="detail-value">${reservation.expires_in_minutes} minutes</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="reservation-actions">
-                        <button class="action-btn btn-confirm" onclick="confirmArrival(${reservation.id})">
-                            <i class="fas fa-check"></i> Confirm Arrival
-                        </button>
-                        <button class="action-btn btn-cancel" onclick="cancelReservation(${reservation.id})">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // Action functions
-        async function confirmArrival(sessionId) {
-            if (!confirm('Confirm user arrival? This will convert reservation to active session.')) return;
-            
-            try {
-                const result = await API.confirmUserArrival(sessionId);
-                showNotification(result.message || 'Arrival confirmed successfully', 'success');
-                loadDashboard(); // Refresh all data
-            } catch (error) {
-                console.error('Error confirming arrival:', error);
-                showNotification('Failed to confirm arrival: ' + error.message, 'error');
-            }
-        }
-        
-        async function cancelSession(sessionId) {
-            if (!confirm('Cancel this session? The user will be notified.')) return;
-            
-            try {
-                const result = await API.cancelOwnerReservation(sessionId);
-                showNotification(result.message || 'Session cancelled successfully', 'success');
-                loadDashboard(); // Refresh all data
-            } catch (error) {
-                console.error('Error cancelling session:', error);
-                showNotification('Failed to cancel session: ' + error.message, 'error');
-            }
-        }
-        
-        async function cancelReservation(reservationId) {
-            if (!confirm('Cancel this reservation? The parking spot will be released.')) return;
-            
-            try {
-                const result = await API.cancelOwnerReservation(reservationId);
-                showNotification(result.message || 'Reservation cancelled successfully', 'success');
-                loadDashboard(); // Refresh all data
-            } catch (error) {
-                console.error('Error cancelling reservation:', error);
-                showNotification('Failed to cancel reservation: ' + error.message, 'error');
-            }
-        }
-        
-        function viewSessionDetails(sessionId) {
-            // You can implement a modal or separate page for detailed view
-            alert(`Viewing session details for ID: ${sessionId}\n\nThis would show complete session history, payments, etc.`);
-        }
-        
-        function viewParkingSessions(parkingId) {
-            alert(`Viewing all sessions for parking ID: ${parkingId}\n\nThis would filter and show sessions only for this parking space.`);
-        }
-        
-        // Individual refresh functions
-        async function loadActiveSessions() {
-            try {
-                const sessions = await API.getOwnerActiveSessions();
-                renderActiveSessions(sessions);
-                showNotification('Active sessions refreshed', 'success');
-            } catch (error) {
-                console.error('Error refreshing active sessions:', error);
-                showNotification('Failed to refresh active sessions', 'error');
-            }
-        }
-        
-        async function loadReservations() {
-            try {
-                const reservations = await API.getOwnerReservations();
-                renderReservations(reservations);
-                showNotification('Reservations refreshed', 'success');
-            } catch (error) {
-                console.error('Error refreshing reservations:', error);
-                showNotification('Failed to refresh reservations', 'error');
-            }
-        }
-        
-        async function loadMyParkings() {
-            try {
-                const parkings = await API.getMyParkings();
-                renderParkings(parkings);
-                showNotification('Parking spaces refreshed', 'success');
-            } catch (error) {
-                console.error('Error refreshing parking spaces:', error);
-                showNotification('Failed to refresh parking spaces', 'error');
-            }
-        }
-        
-        // Initialize dashboard on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in and is an owner
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/login.html';
-                return;
-            }
-            
-            // Decode token to check role
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                if (payload.role !== 'owner') {
-                    alert('You need to be an owner to access this dashboard');
-                    window.location.href = '/home.html';
-                    return;
-                }
-            } catch (e) {
-                console.error('Error decoding token:', e);
-                window.location.href = '/login.html';
-                return;
-            }
-            
-            // Load dashboard data
-            loadDashboard();
-            
-            // Set up auto-refresh every 30 seconds
-            setInterval(() => {
-                loadDashboard();
-            }, 30000);
-        });
-    </script>
+    <script src="./js/owner-dashboard.js"> </script>
+        <script src="js/common.js"></script>
+
 </body>
 </html>
