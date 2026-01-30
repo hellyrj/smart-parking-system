@@ -1,69 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart Parking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EchoPark - Smart Parking System</title>
   <script src="./js/guard.js"></script>
-
   <link rel="stylesheet" href="./css/style.css" />
-  <!-- Leaflet CSS -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+    <link rel="stylesheet" href="./css/home.css" />
 
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
+        </div>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html" class="active">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
 
-  <h1>🚗 Smart Parking System</h1>
-  <a href="add-parking.html">Add Parking</a>
-
-  <button id="findParkingBtn">Find Parking Near Me</button>
-  <input
-  type="text"
-  id="searchInput"
-  placeholder="Search location..."
-/>
-<button id="searchBtn">Search</button>
+  <main class="main-content">
+    <div class="container fade-in">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1><i class="fas fa-parking"></i> EchoPark Smart Parking</h1>
+        <p>Find, reserve, and manage parking spots with our intelligent platform</p>
+      </div>
 
 
-  <div id="map"></div>
-  <div id="parking-list"></div>
+      <!-- Search Section -->
+      <div class="search-container">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="🔍 Search for parking locations, addresses, or types..." 
+          aria-label="Search parking locations"
+        />
+        <button class="btn btn-primary" id="searchBtn">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="flex center wrap gap-20 mb-30">
+        <button class="btn btn-secondary" id="findParkingBtn">
+          <i class="fas fa-location-dot"></i> Find Parking Near Me
+        </button>
+      
+      <!-- Alert -->
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <span>Click on any marker on the map to see parking details. Real-time availability updates every 30 seconds.</span>
+      </div>
+      
+      <!-- Map -->
+      <h2 class="mt-40 mb-20"><i class="fas fa-map"></i> Parking Locations Map</h2>
+      <div id="map"></div>
+      
+      <!-- Available Parking -->
+      <div class="flex between center wrap mt-40 mb-20">
+        <h2><i class="fas fa-car"></i> Available Parking Spots</h2>
+        <div class="user-badge">
+          <i class="fas fa-sync-alt"></i>
+          <span id="lastUpdate">Last updated: Just now</span>
+        </div>
+      </div>
+      
+      <div id="parking-list" class="parking-list">
+        <!-- Parking spots will be loaded here dynamically -->
+        <div class="spinner" id="loadingSpinner"></div>
+      </div>
+    </div>
+  </main>
 
-  <a href="my-parking.html">My Parkings</a>
-  <a href="active-session.html"> View Active Session/a>
- <button onclick="logout()">Logout</button>
-
+  
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
 
   <!-- JS FILES -->
-   <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="./js/api.js"></script>
   <script src="./js/map.js"></script>
   <script src="./js/search.js"></script>
   <script src="js/session.js"></script>
-<!-- Add this script at the top of home.html -->
-<script>
-// Check if user is logged in
-document.addEventListener("DOMContentLoaded", function() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        window.location.href = "/login.html";
-    }
-    
-    // Optional: Show user info
-    const userEmail = localStorage.getItem("userEmail");
-    const userRole = localStorage.getItem("userRole");
-    
-    if (userEmail) {
-        // You can display user info in the UI
-        const userInfoElement = document.getElementById("userInfo");
-        if (userInfoElement) {
-            userInfoElement.textContent = `Logged in as: ${userEmail} (${userRole})`;
-        }
-    }
-});
-</script>
+    <script src="js/common.js"></script>
 
 </body>
 </html>

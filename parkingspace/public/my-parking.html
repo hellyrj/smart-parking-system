@@ -7,18 +7,130 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/my-parking.css" />
+
 </head>
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
+        </div>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html" class="active">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
 <body>
 
   <h2>🚗 My Parking Spaces</h2>
 
   <div id="parkingList"></div>
 
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
+
   <script src="./js/api.js"></script>
   <script src="./js/myParkings.js"></script>
+      <script src="js/common.js"></script>
+
      <script>
       // In my-parking.html or a new reservations.html
 async function loadReservations() {

@@ -1,88 +1,360 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <title>Add Parking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Parking - EchoPark</title>
 
-  <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/add-parking.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
+
 <body>
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
+        </div>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html" class="active">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
 
-  <h2>📍 Add Parking Space</h2>
+  <main class="add-parking-container">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1><i class="fas fa-plus-circle"></i> Add Parking Space</h1>
+        <p>List your parking space and start earning. Fill in the details below and select your location on the map.</p>
+      </div>
 
-  <p>Click on the map to select parking location</p>
+      <!-- Map Section -->
+      <div class="map-section">
+        <div class="map-instructions">
+          <i class="fas fa-map-marker-alt"></i>
+          <p>Click on the map to select your parking location. You can also search for a location below.</p>
+        </div>
+        
+        <div class="search-container">
+          <input
+            type="text"
+            id="searchInput"
+            class="form-control"
+            placeholder="Search for a location or address..."
+            aria-label="Search location"
+          />
+          <button id="searchBtn" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
 
-  <input
-  type="text"
-  id="searchInput"
-  placeholder="Search location..."
-/>
-<button id="searchBtn">Search</button>
+        <div id="map" class="map-container"></div>
+      </div>
 
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="parkingForm">
+          <!-- Basic Information -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              <i class="fas fa-signature"></i> Parking Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              placeholder="e.g., Downtown Premium Parking"
+              required
+              aria-describedby="nameHelp"
+            />
+            <div id="nameHelp" class="validation-message">
+              Give your parking space a descriptive name
+            </div>
+          </div>
 
-  <div id="map"></div>
+          <div class="form-group">
+            <label for="description" class="form-label">
+              <i class="fas fa-align-left"></i> Description
+            </label>
+            <textarea
+              id="description"
+              class="form-control"
+              placeholder="Describe your parking space (features, access instructions, special notes)"
+              rows="4"
+            ></textarea>
+          </div>
 
- <form id="parkingForm">
+          <!-- Details Grid -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="totalSpots" class="form-label">
+                <i class="fas fa-car"></i> Total Spots
+              </label>
+              <input
+                type="number"
+                id="totalSpots"
+                class="form-control"
+                placeholder="e.g., 5"
+                min="1"
+                max="100"
+                required
+              />
+            </div>
 
-  <input
-    type="text"
-    id="name"
-    placeholder="Parking name"
-    required
-  />
+            <div class="form-group">
+              <label for="price" class="form-label">
+                <i class="fas fa-money-bill-wave"></i> Price per Hour ($)
+              </label>
+              <input
+                type="number"
+                id="price"
+                class="form-control"
+                placeholder="e.g., 10"
+                min="1"
+                max="100"
+                step="0.5"
+                required
+              />
+            </div>
 
-  <textarea
-    id="description"
-    placeholder="Description (optional)"
-  ></textarea>
+            <div class="form-group">
+              <label for="address" class="form-label">
+                <i class="fas fa-map-marked-alt"></i> Street Address
+              </label>
+              <input
+                type="text"
+                id="address"
+                class="form-control"
+                placeholder="e.g., 123 Main Street"
+              />
+            </div>
 
-  <input
-    type="number"
-    id="totalSpots"
-    placeholder="Total spots"
-    required
-  />
+            <div class="form-group">
+              <label for="city" class="form-label">
+                <i class="fas fa-city"></i> City
+              </label>
+              <input
+                type="text"
+                id="city"
+                class="form-control"
+                placeholder="e.g., New York"
+              />
+            </div>
+          </div>
 
-  <input
-    type="number"
-    id="price"
-    placeholder="Price per hour"
-    required
-  />
+          <!-- File Uploads -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-images"></i> Parking Images
+            </label>
+            <div class="file-upload-group">
+              <div class="file-upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="file-upload-text">
+                <h4>Upload Images</h4>
+                <p>Upload up to 10 images of your parking space (JPEG, PNG)</p>
+              </div>
+              <input
+                type="file"
+                id="parkingImages"
+                class="file-input"
+                multiple
+                accept="image/*"
+                aria-describedby="imagesHelp"
+              />
+              <div id="imagesHelp" class="validation-message">
+                Clear images help attract more users
+              </div>
+            </div>
+            
+            <!-- Image Preview Container -->
+            <div id="imagePreview" class="preview-container"></div>
+          </div>
 
-  <input
-    type="text"
-    id="address"
-    placeholder="Address (optional)"
-  />
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="legalDocument" class="form-label">
+                <i class="fas fa-file-contract"></i> Legal Document
+              </label>
+              <div class="file-upload-group">
+                <input
+                  type="file"
+                  id="legalDocument"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  aria-describedby="legalHelp"
+                />
+                <div id="legalHelp" class="validation-message">
+                  Upload ownership proof or lease agreement
+                </div>
+              </div>
+            </div>
 
-  <input
-    type="text"
-    id="city"
-    placeholder="City (optional)"
-  />
-  <!-- Add these to your add-parking.html form -->
-   <label for="parkingImages">Parking Images (Multiple, max 10):</label>
-<input type="file" id="parkingImages" multiple accept="image/*" placeholder="Parking Images">
-  <label for="legalDocument">Legal Document (PDF):</label>
-<input type="file" id="legalDocument" accept=".pdf,.doc,.docx" placeholder="Legal Document">
-<label for="paymentProof">Payment Proof (Screenshot):</label>
-<input type="file" id="paymentProof" accept="image/*" placeholder="Payment Proof">
+            <div class="form-group">
+              <label for="paymentProof" class="form-label">
+                <i class="fas fa-receipt"></i> Payment Proof
+              </label>
+              <div class="file-upload-group">
+                <input
+                  type="file"
+                  id="paymentProof"
+                  class="file-input"
+                  accept="image/*,.pdf"
+                  aria-describedby="paymentHelp"
+                />
+                <div id="paymentHelp" class="validation-message">
+                  Upload payment verification screenshot
+                </div>
+              </div>
+            </div>
+          </div>
 
-  <button type="submit">Save Parking</button>
-</form>
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-submit">
+              <i class="fas fa-save"></i> Save Parking Space
+            </button>
+            <button type="reset" class="btn btn-reset">
+              <i class="fas fa-redo"></i> Reset Form
+            </button>
+            <a href="my-parking.html" class="btn btn-cancel">
+              <i class="fas fa-times"></i> Cancel
+            </a>
+          </div>
+        </form>
 
+        <!-- Success Message (hidden by default) -->
+        <div id="successMessage" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          <h3>Parking Space Added Successfully!</h3>
+          <p>Your parking space has been listed. It will be reviewed and activated within 24 hours.</p>
+          <div class="form-actions">
+            <a href="my-parking.html" class="btn btn-submit">
+              <i class="fas fa-list"></i> View My Parkings
+            </a>
+            <button onclick="resetForm()" class="btn btn-reset">
+              <i class="fas fa-plus-circle"></i> Add Another
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Saving your parking space...</p>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="./js/api.js"></script>
-    <script src="./js/search.js"></script>
-
+  <script src="./js/search.js"></script>
   <script src="./js/addParking.js"></script>
-
+  <script src="./js/common.js"></script>
 </body>
 </html>
