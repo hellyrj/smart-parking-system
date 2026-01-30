@@ -1,4 +1,5 @@
 import sequelize from "../config/db.js";
+import { Op } from "sequelize";
 import {
   User,
   parkingSpace,
@@ -288,46 +289,409 @@ export const getDriverSessions = async (req, res) => {
     }
 };
 
-// Cancel reservation (driver side)
-export const cancelDriverReservation = async (req, res) => {
+
+// Get driver's active reservations - FIXED WITH Op IMPORT
+export const getDriverReservations = async (req, res) => {
   try {
-    const { reservationId } = req.params;
+    const userId = req.user.id;
+    console.log("Getting reservations for user:", userId);
     
-    const session = await parkingSession.findByPk(reservationId, {
+    // Find all reservations for this user
+    const reservations = await parkingSession.findAll({
+      where: {
+        user_id: userId,
+        session_type: 'reserved'
+      },
+      include: [{
+        model: parkingSpace,
+        as: 'parkingSpace',
+        include: [{
+          model: parkingLocation,
+          as: 'parkingLocations'
+        }]
+      }],
+      order: [['reserved_until', 'ASC']] // Sort by soonest expiration
+    });
+    
+    console.log(`Found ${reservations.length} reservations`);
+    
+    // Check for expired reservations and auto-cancel them
+    const now = new Date();
+    const updatedReservations = [];
+    
+    for (const reservation of reservations) {
+      try {
+        // Check if reservation has isReservationExpired method
+        if (reservation.isReservationExpired && typeof reservation.isReservationExpired === 'function') {
+          if (reservation.isReservationExpired()) {
+            console.log(`Reservation ${reservation.id} is expired, auto-cancelling...`);
+            // Auto-cancel expired reservation
+            try {
+              await reservation.autoCancelExpiredReservation();
+              console.log(`Auto-cancelled expired reservation: ${reservation.id}`);
+              continue; // Skip adding to list since it's now cancelled
+            } catch (autoCancelError) {
+              console.error(`Error auto-cancelling reservation ${reservation.id}:`, autoCancelError);
+              // Continue with the reservation even if auto-cancel failed
+            }
+          }
+        } else {
+          console.log(`Reservation ${reservation.id} doesn't have isReservationExpired method`);
+        }
+        
+        updatedReservations.push(reservation);
+      } catch (reservationError) {
+        console.error(`Error processing reservation ${reservation.id}:`, reservationError);
+        // Skip this reservation if there's an error
+      }
+    }
+    
+    // Format response
+    const formattedReservations = updatedReservations.map(reservation => {
+      try {
+        const data = reservation.toJSON();
+        
+        // Calculate time remaining
+        let timeRemaining = null;
+        let minutesRemaining = null;
+        
+        if (data.reserved_until) {
+          const reservedUntil = new Date(data.reserved_until);
+          const timeLeft = reservedUntil - now;
+          minutesRemaining = Math.max(0, Math.floor(timeLeft / (1000 * 60)));
+          
+          if (minutesRemaining > 0) {
+            const hours = Math.floor(minutesRemaining / 60);
+            const mins = minutesRemaining % 60;
+            timeRemaining = `${hours}h ${mins}m`;
+          } else {
+            timeRemaining = "Expired";
+          }
+        }
+        
+        // Determine reservation status
+        let reservationStatus = 'active';
+        if (data.session_status === 'cancelled') {
+          reservationStatus = 'cancelled';
+        } else if (data.reserved_until && new Date(data.reserved_until) < now) {
+          reservationStatus = 'expired';
+        } else if (data.reservation_status === 'waiting') {
+          reservationStatus = 'waiting';
+        }
+        
+        return {
+          id: data.id,
+          parking_id: data.parking_id,
+          user_id: data.user_id,
+          vehicle_plate: data.vehicle_plate,
+          vehicle_model: data.vehicle_model,
+          session_type: data.session_type,
+          reservation_status: reservationStatus,
+          reserved_until: data.reserved_until,
+          created_at: data.createdAt,
+          updated_at: data.updatedAt,
+          time_remaining: timeRemaining,
+          minutes_remaining: minutesRemaining,
+          parkingSpace: data.parkingSpace ? {
+            id: data.parkingSpace.id,
+            name: data.parkingSpace.name,
+            price_per_hour: data.parkingSpace.price_per_hour,
+            total_spots: data.parkingSpace.total_spots,
+            available_spots: data.parkingSpace.available_spots,
+            is_active: data.parkingSpace.is_active,
+            parkingLocations: data.parkingSpace.parkingLocations || []
+          } : null
+        };
+      } catch (formatError) {
+        console.error(`Error formatting reservation ${reservation.id}:`, formatError);
+        return null;
+      }
+    }).filter(reservation => reservation !== null); // Remove null entries
+    
+    // Get recent (non-active) reservations for history - FIXED WITH Op
+    const recentReservations = await parkingSession.findAll({
+      where: {
+        user_id: userId,
+        [Op.or]: [ // FIXED: Using imported Op
+          { session_type: 'reserved', session_status: 'cancelled' },
+          { session_type: 'reserved', session_status: 'completed' }
+        ]
+      },
+      include: [{
+        model: parkingSpace,
+        as: 'parkingSpace'
+      }],
+      order: [['createdAt', 'DESC']],
+      limit: 10
+    });
+    
+    const formattedRecent = recentReservations.map(reservation => {
+      try {
+        const data = reservation.toJSON();
+        return {
+          id: data.id,
+          parking_id: data.parking_id,
+          vehicle_plate: data.vehicle_plate,
+          reservation_status: data.session_status === 'cancelled' ? 'cancelled' : 'expired',
+          reserved_until: data.reserved_until,
+          created_at: data.createdAt,
+          parkingSpace: data.parkingSpace ? {
+            name: data.parkingSpace.name,
+            price_per_hour: data.parkingSpace.price_per_hour
+          } : null
+        };
+      } catch (error) {
+        console.error(`Error formatting recent reservation ${reservation.id}:`, error);
+        return null;
+      }
+    }).filter(reservation => reservation !== null);
+    
+    res.json({
+      success: true,
+      reservations: formattedReservations,
+      recent_reservations: formattedRecent,
+      count: formattedReservations.length
+    });
+    
+  } catch (error) {
+    console.error("Error getting driver reservations:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch reservations", 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+// Check reservation status - FIXED WITH Op
+export const checkReservationStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const reservation = await parkingSession.findOne({
+      where: {
+        id: id,
+        user_id: userId,
+        session_type: 'reserved'
+      },
       include: [parkingSpace]
     });
     
-    if (!session || session.user_id !== req.user.id) {
-      return res.status(404).json({ message: "Reservation not found" });
+    if (!reservation) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Reservation not found",
+        expired: true
+      });
     }
     
-    if (session.session_type !== 'reserved') {
-      return res.status(400).json({ message: "Not a reservation" });
+    const now = new Date();
+    const reservedUntil = new Date(reservation.reserved_until);
+    const isExpired = reservedUntil < now;
+    
+    // Auto-cancel if expired
+    if (isExpired && reservation.reservation_status !== 'cancelled') {
+      await reservation.autoCancelExpiredReservation();
+      
+      res.json({
+        success: true,
+        expired: true,
+        status: 'expired',
+        message: "Reservation has expired"
+      });
+    } else {
+      const minutesRemaining = Math.max(0, Math.floor((reservedUntil - now) / (1000 * 60)));
+      
+      res.json({
+        success: true,
+        expired: false,
+        status: 'active',
+        reservation_id: reservation.id,
+        reserved_until: reservation.reserved_until,
+        minutes_remaining: minutesRemaining,
+        parking_name: reservation.parkingSpace?.name || 'Unknown',
+        vehicle_plate: reservation.vehicle_plate
+      });
     }
     
-    // Release parking spot
-    await session.parkingSpace.releaseSpot();
+  } catch (error) {
+    console.error("Error checking reservation status:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to check reservation status",
+      error: error.message 
+    });
+  }
+};
+
+// Cancel reservation (driver side) - FIXED WITH Op
+export const cancelDriverReservation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
     
-    // Update session
-    session.end_time = new Date();
-    session.session_status = 'cancelled';
-    session.reservation_status = 'cancelled';
-    await session.save();
-    
-    // Notify owner
-    await notification.create({
-      user_id: session.parkingSpace.owner_id,
-      type: 'reservation_cancelled',
-      title: 'Reservation Cancelled',
-      message: `Reservation cancelled by user`,
-      data: JSON.stringify({ session_id: session.id })
+    const session = await parkingSession.findOne({
+      where: {
+        id: id,
+        user_id: userId,
+        session_type: 'reserved'
+      },
+      include: [parkingSpace]
     });
     
-    res.json({ 
-      message: "Reservation cancelled successfully"
+    if (!session) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Reservation not found" 
+      });
+    }
+    
+    // Check if already cancelled
+    if (session.session_status === 'cancelled') {
+      return res.json({ 
+        success: true, 
+        message: "Reservation already cancelled" 
+      });
+    }
+    
+    // Check if already expired
+    if (session.isReservationExpired && session.isReservationExpired()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Reservation has already expired" 
+      });
+    }
+    
+    // Use transaction for consistency
+    const result = await sequelize.transaction(async (t) => {
+      // Release parking spot
+      if (session.parkingSpace) {
+        await session.parkingSpace.releaseSpot(t);
+      }
+      
+      // Update session status
+      session.session_status = 'cancelled';
+      session.reservation_status = 'cancelled';
+      session.end_time = new Date();
+      await session.save({ transaction: t });
+      
+      // Notify owner
+      if (session.parkingSpace) {
+        await notification.create({
+          user_id: session.parkingSpace.owner_id,
+          type: 'reservation_cancelled',
+          title: 'Reservation Cancelled',
+          message: `Reservation #${session.id} has been cancelled by user`,
+          data: JSON.stringify({ 
+            session_id: session.id,
+            parking_name: session.parkingSpace.name,
+            vehicle_plate: session.vehicle_plate
+          })
+        }, { transaction: t });
+      }
+      
+      return session;
     });
+    
+    res.json({
+      success: true,
+      message: "Reservation cancelled successfully",
+      reservation_id: result.id,
+      cancelled_at: result.end_time
+    });
+    
   } catch (error) {
     console.error("Cancel reservation error:", error);
-    res.status(500).json({ message: "Failed to cancel reservation" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to cancel reservation", 
+      error: error.message 
+    });
+  }
+};
+
+// Get reservation by ID (detailed view) - FIXED WITH Op
+export const getReservationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const reservation = await parkingSession.findOne({
+      where: {
+        id: id,
+        user_id: userId
+      },
+      include: [{
+        model: parkingSpace,
+        as: 'parkingSpace',
+        include: [{
+          model: parkingLocation,
+          as: 'parkingLocations'
+        }]
+      }]
+    });
+    
+    if (!reservation) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Reservation not found" 
+      });
+    }
+    
+    // Check if expired
+    const now = new Date();
+    const reservedUntil = new Date(reservation.reserved_until);
+    const isExpired = reservedUntil < now && reservation.session_type === 'reserved';
+    
+    if (isExpired && reservation.session_status !== 'cancelled') {
+      await reservation.autoCancelExpiredReservation();
+      reservation.session_status = 'expired';
+    }
+    
+    const minutesRemaining = Math.max(0, Math.floor((reservedUntil - now) / (1000 * 60)));
+    
+    const response = {
+      success: true,
+      reservation: {
+        id: reservation.id,
+        parking_id: reservation.parking_id,
+        user_id: reservation.user_id,
+        vehicle_plate: reservation.vehicle_plate,
+        vehicle_model: reservation.vehicle_model,
+        session_type: reservation.session_type,
+        session_status: reservation.session_status,
+        reservation_status: reservation.reservation_status,
+        reserved_until: reservation.reserved_until,
+        start_time: reservation.start_time,
+        end_time: reservation.end_time,
+        created_at: reservation.createdAt,
+        updated_at: reservation.updatedAt,
+        minutes_remaining: minutesRemaining,
+        is_expired: isExpired,
+        parkingSpace: reservation.parkingSpace ? {
+          id: reservation.parkingSpace.id,
+          name: reservation.parkingSpace.name,
+          price_per_hour: reservation.parkingSpace.price_per_hour,
+          total_spots: reservation.parkingSpace.total_spots,
+          available_spots: reservation.parkingSpace.available_spots,
+          is_active: reservation.parkingSpace.is_active,
+          operating_hours: reservation.parkingSpace.operating_hours,
+          description: reservation.parkingSpace.description,
+          parkingLocations: reservation.parkingSpace.parkingLocations || []
+        } : null
+      }
+    };
+    
+    res.json(response);
+    
+  } catch (error) {
+    console.error("Error getting reservation:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch reservation", 
+      error: error.message 
+    });
   }
 };

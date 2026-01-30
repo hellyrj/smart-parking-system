@@ -5,6 +5,11 @@ if (typeof window.API_BASE === 'undefined') {
     window.API_BASE = "http://localhost:3000/api";
 }
 
+// Helper function to get token
+function getToken() {
+    return localStorage.getItem("token");
+}
+
 const API = {
     // ✅ Parking Search
     async searchParking(lat, lng, radius = 3) {
@@ -14,11 +19,76 @@ const API = {
         return res.json();
     },
 
+    // ✅ Get parking details
+    async getParkingDetails(parkingId) {
+        try {
+            const response = await fetch(`${window.API_BASE}/parking/${parkingId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting parking details:', error);
+            return null;
+        }
+    },
+    
+    // ✅ Get driver reservations
+    async getDriverReservations() {
+        try {
+            const response = await fetch(`${window.API_BASE}/driver/reservations`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting reservations:', error);
+            return { success: false, message: error.message };
+        }
+    },
+    
+    // ✅ Check reservation status
+    async checkReservationStatus(reservationId) {
+        try {
+            const response = await fetch(`${window.API_BASE}/reservations/${reservationId}/status`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error checking reservation status:', error);
+            return { expired: true };
+        }
+    },
+    
+    // ✅ Cancel reservation
+    async cancelReservation(reservationId) {
+        try {
+            const response = await fetch(`${window.API_BASE}/driver/reservations/${reservationId}/cancel`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error cancelling reservation:', error);
+            return { success: false, message: error.message };
+        }
+    },
+
     // ✅ DRIVER: Get driver's active sessions
     async getDriverSessions() {
         const res = await fetch(`${window.API_BASE}/driver/sessions`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return await res.json();
@@ -30,7 +100,7 @@ const API = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ 
                 parkingId, 
@@ -42,36 +112,37 @@ const API = {
     },
 
     // ✅ DRIVER: Start parking session (convert reservation to active)
-async startParkingSession(reservationId) {
-    const res = await fetch(`${window.API_BASE}/driver/session/start`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ reservationId }), // ✅ CORRECT: matches backend
-    });
-    return res.json();
-},
+    async startParkingSession(reservationId) {
+        const res = await fetch(`${window.API_BASE}/driver/session/start`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ reservationId }),
+        });
+        return res.json();
+    },
 
-async endParkingSession(sessionId) {
-    const res = await fetch(`${window.API_BASE}/driver/session/end`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ sessionId }), // ✅ CORRECT: matches backend
-    });
-    return res.json();
-},
+    // ✅ DRIVER: End parking session
+    async endParkingSession(sessionId) {
+        const res = await fetch(`${window.API_BASE}/driver/session/end`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ sessionId }),
+        });
+        return res.json();
+    },
 
-    // ✅ DRIVER: Cancel reservation
+    // ✅ DRIVER: Cancel driver reservation (alternative endpoint)
     async cancelDriverReservation(reservationId) {
         const res = await fetch(`${window.API_BASE}/driver/reservation/${reservationId}`, {
             method: "DELETE",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -81,19 +152,18 @@ async endParkingSession(sessionId) {
     async getMyParkings() {
         const res = await fetch(`${window.API_BASE}/owner/parkings`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
     },
 
-    // ✅ OWNER: Create parking (with file upload - you'll need to use FormData)
+    // ✅ OWNER: Create parking (with file upload)
     async createParking(formData) {
         const res = await fetch(`${window.API_BASE}/owner/parkings`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                // Note: Don't set Content-Type for FormData, browser will set it automatically
+                Authorization: `Bearer ${getToken()}`,
             },
             body: formData,
         });
@@ -106,7 +176,7 @@ async endParkingSession(sessionId) {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify(data),
         });
@@ -118,7 +188,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/owner/parkings/${id}`, {
             method: "DELETE",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -129,7 +199,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/owner/parkings/${id}/deactivate`, {
             method: "PATCH",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -140,7 +210,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/owner/parkings/${id}/activate`, {
             method: "PATCH",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -150,7 +220,7 @@ async endParkingSession(sessionId) {
     async getOwnerActiveSessions() {
         const res = await fetch(`${window.API_BASE}/owner/session/active`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -160,7 +230,7 @@ async endParkingSession(sessionId) {
     async getOwnerReservations() {
         const res = await fetch(`${window.API_BASE}/owner/session/reservations`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -171,7 +241,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/owner/session/${sessionId}/confirm-arrival`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -182,7 +252,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/owner/session/${sessionId}/cancel`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -192,7 +262,7 @@ async endParkingSession(sessionId) {
     async getOwnerEarnings() {
         const res = await fetch(`${window.API_BASE}/owner/earnings`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -202,7 +272,17 @@ async endParkingSession(sessionId) {
     async getOwnerNotifications() {
         const res = await fetch(`${window.API_BASE}/owner/notifications`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
+        return res.json();
+    },
+
+    // ✅ Get parking by ID (for edit)
+    async getParkingById(id) {
+        const res = await fetch(`${window.API_BASE}/owner/parkings/${id}`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -212,7 +292,7 @@ async endParkingSession(sessionId) {
     async getMyProfile() {
         const res = await fetch(`${window.API_BASE}/user/profile`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -224,7 +304,7 @@ async endParkingSession(sessionId) {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify(data),
         });
@@ -236,7 +316,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/user/become-owner`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -247,7 +327,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/user/documents`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: formData,
         });
@@ -258,7 +338,7 @@ async endParkingSession(sessionId) {
     async getMyDocuments() {
         const res = await fetch(`${window.API_BASE}/user/documents`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -268,7 +348,7 @@ async endParkingSession(sessionId) {
     async getNotifications() {
         const res = await fetch(`${window.API_BASE}/notifications`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -279,7 +359,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/notifications/${notificationId}/read`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -290,7 +370,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/notifications/read-all`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -300,7 +380,7 @@ async endParkingSession(sessionId) {
     async getDashboardStats() {
         const res = await fetch(`${window.API_BASE}/admin/dashboard`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -310,7 +390,7 @@ async endParkingSession(sessionId) {
     async getAdminUsers() {
         const res = await fetch(`${window.API_BASE}/admin/users`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -320,7 +400,7 @@ async endParkingSession(sessionId) {
     async getAdminOwners() {
         const res = await fetch(`${window.API_BASE}/admin/owners`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -331,7 +411,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/admin/owners/${userId}/verify`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -343,7 +423,7 @@ async endParkingSession(sessionId) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ reason }),
         });
@@ -354,7 +434,7 @@ async endParkingSession(sessionId) {
     async getAdminParkings() {
         const res = await fetch(`${window.API_BASE}/admin/parkings`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -365,7 +445,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/admin/parkings/${parkingId}/approve`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -377,7 +457,7 @@ async endParkingSession(sessionId) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ reason }),
         });
@@ -389,7 +469,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/admin/documents/${docId}/approve`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -401,7 +481,7 @@ async endParkingSession(sessionId) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ reason }),
         });
@@ -413,7 +493,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/admin/users/${userId}`, {
             method: "DELETE",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -425,7 +505,7 @@ async endParkingSession(sessionId) {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ status }),
         });
@@ -436,7 +516,7 @@ async endParkingSession(sessionId) {
     async getUserDocuments(userId) {
         const res = await fetch(`${window.API_BASE}/admin/users/${userId}/documents`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();
@@ -447,17 +527,7 @@ async endParkingSession(sessionId) {
         const res = await fetch(`${window.API_BASE}/admin/payments/${paymentId}/verify`, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
-        return res.json();
-    },
-
-    // ✅ Get parking by ID (for edit)
-    async getParkingById(id) {
-        const res = await fetch(`${window.API_BASE}/owner/parkings/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${getToken()}`,
             },
         });
         return res.json();

@@ -57,10 +57,6 @@ const upload = multer({
 });
 
 // ADD THESE FUNCTIONS at the bottom of ownerController.js:
-
-// In ownerController.js - REPLACE the incomplete createParkingWithUpload function:
-
-
 // Create parking with file upload middleware
 export const createParkingWithUpload = [
   upload.fields([

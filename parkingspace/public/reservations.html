@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reservations - EchoPark</title>
+    <script src="./js/guard.js"></script>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/reservations.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container flex between center wrap">
+            <a class="brand" href="home.html">
+                <div class="mark">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <span>EchoPark</span>
+            </a>
+            
+            <nav class="nav">
+                <a href="home.html">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="active-session.html">
+                    <i class="fas fa-clock"></i> Active Sessions
+                </a>
+                <a href="reservations.html" class="active">
+                    <i class="fas fa-calendar-check"></i> My Reservations
+                </a>
+                <a href="history.html">
+                    <i class="fas fa-history"></i> History
+                </a>
+                
+                <div class="header-actions">
+                    <div class="user-badge" id="userInfo">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userEmail">User</span>
+                    </div>
+                    <button class="btn btn-danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-calendar-check"></i> My Reservations</h1>
+                <p>Manage your reserved parking spots. Reservations expire in 30 minutes if not activated.</p>
+            </div>
+
+            <!-- Reservation Timer Banner -->
+            <div class="alert alert-warning" id="reservationTimer" style="display: none;">
+                <i class="fas fa-clock"></i>
+                <span id="timerMessage">You have an active reservation expiring soon</span>
+                <button class="btn btn-sm btn-primary" onclick="goToReservation()">Activate Now</button>
+            </div>
+
+            <!-- Reservations List -->
+            <div class="reservations-container">
+                <div class="section-header">
+                    <h2><i class="fas fa-hourglass-half"></i> Active Reservations</h2>
+                    <div class="refresh-controls">
+                        <button class="btn btn-sm btn-secondary" onclick="loadReservations()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div id="reservationsList" class="reservations-list">
+                    <!-- Reservations will be loaded here -->
+                    <div class="spinner" id="loadingSpinner"></div>
+                </div>
+
+                <!-- No Reservations Message -->
+                <div id="noReservations" style="display: none; text-align: center; padding: 40px;">
+                    <div style="font-size: 60px; color: #d1d5db; margin-bottom: 20px;">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <h3 style="color: #6b7280; margin-bottom: 10px;">No Active Reservations</h3>
+                    <p style="color: #9ca3af; margin-bottom: 20px;">
+                        You don't have any active reservations. Find a parking spot and make a reservation!
+                    </p>
+                    <a href="home.html" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Find Parking
+                    </a>
+                </div>
+
+                <!-- Expired Reservations Section -->
+                <div class="section-header mt-40">
+                    <h2><i class="fas fa-history"></i> Recent Reservations</h2>
+                </div>
+                
+                <div id="recentReservations" class="reservations-list">
+                    <!-- Recent reservations will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Reservation Info Card -->
+            <div class="info-card">
+                <div class="info-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>How Reservations Work</h3>
+                </div>
+                <div class="info-body">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <strong>30-Minute Hold</strong>
+                            <p>Your spot is reserved for 30 minutes. Arrive and activate before time expires.</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div>
+                            <strong>Automatic Release</strong>
+                            <p>If not activated in time, the spot becomes available for others automatically.</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div>
+                            <strong>Notifications</strong>
+                            <p>Get reminders when your reservation is about to expire.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="copyright">
+                <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS Files -->
+    <script src="./js/api.js"></script>
+    <script src="./js/reservations.js"></script>
+    <script src="./js/common.js"></script>
+</body>
+</html>

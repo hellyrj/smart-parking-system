@@ -102,31 +102,71 @@ const ParkingSession = sequelize.define("parkingSession", {
   timestamps: true
 });
 
-// Instance method to check if reservation is expired
-ParkingSession.prototype.isReservationExpired = function () {
-  if (this.session_type !== 'reserved' || !this.reserved_until) {
+// Check if reservation is expired
+ParkingSession.prototype.isReservationExpired = function() {
+  if (this.session_type !== 'reserved') {
     return false;
   }
   
-  return new Date() > new Date(this.reserved_until);
-};
-
-// Instance method to auto-cancel expired reservation
-ParkingSession.prototype.autoCancelExpiredReservation = async function (transaction) {
-  if (this.isReservationExpired()) {
-    this.end_time = new Date();
-    this.session_status = "cancelled";
-    this.reservation_status = "expired";
-    await this.save({ transaction });
-    
-    // Release parking spot
-    const parkingSpace = await this.getParkingSpace();
-    await parkingSpace.releaseSpot({ transaction });
-    
-    return true;
+  if (!this.reserved_until) {
+    return false;
   }
   
-  return false;
+  const now = new Date();
+  const reservedUntil = new Date(this.reserved_until);
+  return reservedUntil < now;
+};
+
+// Auto-cancel expired reservation
+ParkingSession.prototype.autoCancelExpiredReservation = async function(transaction = null) {
+  if (this.session_type !== 'reserved' || this.session_status === 'cancelled') {
+    return;
+  }
+  
+  try {
+    // Get associated parking space
+    const parkingSpace = await this.getParkingSpace();
+    
+    if (parkingSpace) {
+      // Release the spot
+      await parkingSpace.releaseSpot(transaction);
+    }
+    
+    // Update session status
+    this.session_status = 'cancelled';
+    this.reservation_status = 'expired';
+    this.end_time = new Date();
+    
+    const saveOptions = transaction ? { transaction } : {};
+    await this.save(saveOptions);
+    
+    console.log(`Auto-cancelled expired reservation: ${this.id}`);
+    
+  } catch (error) {
+    console.error(`Error auto-cancelling reservation ${this.id}:`, error);
+    throw error;
+  }
+};
+
+// Check if reservation can be activated
+ParkingSession.prototype.canBeActivated = function() {
+  if (this.session_type !== 'reserved') {
+    return { canActivate: false, reason: 'Not a reservation' };
+  }
+  
+  if (this.session_status === 'cancelled') {
+    return { canActivate: false, reason: 'Reservation was cancelled' };
+  }
+  
+  if (this.isReservationExpired()) {
+    return { canActivate: false, reason: 'Reservation has expired' };
+  }
+  
+  if (this.actual_start_time) {
+    return { canActivate: false, reason: 'Session already started' };
+  }
+  
+  return { canActivate: true };
 };
 
 // Instance method to confirm arrival

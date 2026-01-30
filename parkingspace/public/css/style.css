@@ -1,44 +1,46 @@
+[file name]: style.css
+[file content begin]
 :root {
-  /* Vibrant Color Palette */
-  --primary: #2563eb;      /* Bright blue - primary */
-  --primary-dark: #1d4ed8; /* Darker blue */
-  --primary-light: #3b82f6; /* Light blue */
-  --secondary: #10b981;    /* Vibrant green - available */
-  --secondary-dark: #059669; /* Dark green */
-  --warning: #f59e0b;      /* Bright orange/yellow */
-  --danger: #ef4444;       /* Strong red - occupied */
-  --danger-dark: #dc2626;  /* Darker red */
-  --light: #ffffff;        /* White background */
-  --light-gray: #f1f5f9;   /* Light gray */
-  --gray: #94a3b8;         /* Medium gray */
-  --dark: #1e293b;         /* Dark text */
-  --charcoal: #0f172a;     /* Footer/dark mode */
+  /* Light Golden Color Palette */
+  --primary: #D4AF37;      /* Rich gold - primary */
+  --primary-dark: #B8860B; /* Darker gold */
+  --primary-light: #E6C67C; /* Light gold */
+  --secondary: #C5A572;    /* Warm beige/gold */
+  --secondary-dark: #A67C52; /* Darker beige */
+  --warning: #FFD700;      /* Bright gold/yellow */
+  --danger: #B22222;       /* Deep red */
+  --danger-dark: #8B0000;  /* Darker red */
+  --light: #FFF8E1;        /* Light golden background */
+  --light-gray: #F5F0E6;   /* Warm light gray */
+  --gray: #C0B8A8;         /* Warm medium gray */
+  --dark: #2C2416;         /* Dark golden brown text */
+  --charcoal: #1A1814;     /* Footer/dark mode */
   
   /* Theme Variables */
-  --bg-color: #ffffff;
-  --text-color: #1e293b;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --header-bg: #ffffff;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --bg-color: #FFF8E1;
+  --text-color: #2C2416;
+  --card-bg: #FFFFFF;
+  --border-color: #E6D8B5;
+  --header-bg: #FFFFFF;
+  --shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+  --shadow-lg: 0 10px 25px rgba(212, 175, 55, 0.2);
+  --shadow-hover: 0 20px 40px rgba(212, 175, 55, 0.25);
   --radius: 10px;
   --radius-lg: 15px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark Theme Variables */
+/* Dark Theme - Gold and Black */
 [data-theme="dark"] {
-  --bg-color: #0f172a;
-  --text-color: #f1f5f9;
-  --card-bg: #1e293b;
-  --border-color: #334155;
-  --header-bg: #1e293b;
-  --light-gray: #334155;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --bg-color: #0A0A0A;
+  --text-color: #FFD700;
+  --card-bg: #1A1A1A;
+  --border-color: #333333;
+  --header-bg: #1A1A1A;
+  --light-gray: #222222;
+  --shadow: 0 4px 12px rgba(255, 215, 0, 0.25);
+  --shadow-lg: 0 10px 25px rgba(255, 215, 0, 0.3);
+  --shadow-hover: 0 20px 40px rgba(255, 215, 0, 0.4);
 }
 
 /* Reset + Base */
@@ -99,16 +101,16 @@ body {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   display: grid;
   place-items: center;
-  color: white;
+  color: #1A1A1A;
   font-weight: 700;
   font-size: 1.3rem;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
 }
 
 .brand span {
   font-weight: 700;
   font-size: 1.4rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary), #FFD700);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -127,21 +129,23 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--card-bg);
-  color: var(--text-color);
+  color: var(--primary);
   transition: var(--transition);
   box-shadow: var(--shadow);
   margin-left: 10px;
+  border: 1px solid var(--border-color);
 }
 
 .theme-toggle:hover {
   background: var(--primary);
-  color: white;
+  color: #1A1A1A;
   transform: rotate(30deg);
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
 }
 
 .theme-toggle .fa-sun {
   display: none;
+  color: #FFD700;
 }
 
 [data-theme="dark"] .theme-toggle .fa-moon {
@@ -179,7 +183,7 @@ body {
   transform: translateX(-50%);
   width: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: linear-gradient(90deg, var(--primary), #FFD700);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -192,7 +196,7 @@ body {
 .nav a:hover,
 .nav a.active {
   color: var(--primary);
-  background: linear-gradient(to right, rgba(37, 99, 235, 0.1), rgba(16, 185, 129, 0.1));
+  background: linear-gradient(to right, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.1));
 }
 
 /* Buttons */
@@ -216,53 +220,53 @@ body {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: white;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  color: #1A1A1A;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
 }
 
 .btn-secondary {
   background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
-  color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  color: #1A1A1A;
+  box-shadow: 0 4px 15px rgba(197, 165, 114, 0.4);
 }
 
 .btn-secondary:hover {
   background: linear-gradient(135deg, var(--secondary-dark), var(--secondary));
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 25px rgba(197, 165, 114, 0.6);
 }
 
 .btn-outline {
   background: transparent;
   color: var(--primary);
   border: 2px solid var(--primary);
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .btn-outline:hover {
   background: var(--primary);
-  color: white;
+  color: #1A1A1A;
   border-color: var(--primary);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
 }
 
 .btn-danger {
   background: linear-gradient(135deg, var(--danger), var(--danger-dark));
   color: white;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 15px rgba(178, 34, 34, 0.4);
 }
 
 .btn-danger:hover {
   background: linear-gradient(135deg, var(--danger-dark), var(--danger));
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 8px 25px rgba(178, 34, 34, 0.6);
 }
 
 /* Header Buttons */
@@ -304,6 +308,7 @@ body {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
 }
 
 .menu-toggle span {
@@ -347,12 +352,12 @@ body {
     background: var(--card-bg);
     flex-direction: column;
     padding: 90px 24px 24px;
-    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
     gap: 10px;
     overflow-y: auto;
-    border-left: 1px solid var(--border-color);
+    border-left: 2px solid var(--primary);
   }
   
   .nav.active {
@@ -391,7 +396,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(26, 24, 20, 0.9);
     z-index: 999;
     opacity: 0;
     visibility: hidden;
@@ -404,11 +409,10 @@ body {
   }
 }
 
-
 /* Footer */
 footer {
   background: var(--charcoal);
-  color: white;
+  color: #FFD700;
   padding: 60px 0 30px;
   margin-top: 60px;
   position: relative;
@@ -421,7 +425,7 @@ footer::before {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: linear-gradient(90deg, var(--primary), #FFD700);
 }
 
 .footer-content {
@@ -432,7 +436,7 @@ footer::before {
 }
 
 .footer-column h3 {
-  color: white;
+  color: #FFD700;
   font-size: 1.3rem;
   margin-bottom: 25px;
   position: relative;
@@ -447,7 +451,7 @@ footer::before {
   left: 0;
   width: 50px;
   height: 4px;
-  background: var(--secondary);
+  background: var(--primary);
   border-radius: 2px;
 }
 
@@ -461,7 +465,7 @@ footer::before {
 }
 
 .footer-links a {
-  color: #cbd5e1;
+  color: #E6C67C;
   text-decoration: none;
   transition: var(--transition);
   display: flex;
@@ -471,12 +475,12 @@ footer::before {
 }
 
 .footer-links a:hover {
-  color: var(--secondary);
+  color: var(--primary);
   transform: translateX(8px);
 }
 
 .footer-links i {
-  color: var(--secondary);
+  color: var(--primary);
   width: 20px;
   font-size: 1.1rem;
 }
@@ -493,25 +497,25 @@ footer::before {
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(255, 215, 0, 0.1);
+  color: #FFD700;
   border-radius: 50%;
   transition: var(--transition);
   font-size: 1.2rem;
 }
 
 .social-links a:hover {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  background: linear-gradient(135deg, var(--primary), #FFD700);
+  color: #1A1A1A;
   transform: translateY(-5px) scale(1.1);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 20px rgba(255, 215, 0, 0.4);
 }
 
 .copyright {
   text-align: center;
-  color: #94a3b8;
+  color: #C5A572;
   padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -624,7 +628,7 @@ footer::before {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 60px auto;
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 @keyframes spin {
@@ -657,25 +661,26 @@ footer::before {
 }
 
 .alert-success {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
-  color: var(--secondary-dark);
-  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(197, 165, 114, 0.05));
+  color: var(--primary-dark);
+  border-color: var(--primary);
 }
 
 .alert-error {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  background: linear-gradient(135deg, rgba(178, 34, 34, 0.1), rgba(139, 0, 0, 0.05));
   color: var(--danger);
   border-color: var(--danger);
 }
 
 .alert-info {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.05));
-  color: var(--primary);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05));
+  color: var(--primary-dark);
   border-color: var(--primary);
 }
 
 .alert i {
   font-size: 1.4rem;
+  color: var(--primary);
 }
 
 /* Fade In Animation */
@@ -687,3 +692,4 @@ footer::before {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+[file content end]

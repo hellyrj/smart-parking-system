@@ -27,12 +27,15 @@ body {
     text-align: center;
     padding: 80px 20px;
     background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.1) 0%, 
-        rgba(16, 185, 129, 0.1) 100%);
+        rgba(0, 0, 0, 0.9) 0%, 
+        rgba(30, 30, 30, 0.95) 100%);
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     margin-bottom: 60px;
     position: relative;
     overflow: hidden;
+}
+.home-hero{
+    color: white;
 }
 
 .home-hero::before {
@@ -51,15 +54,18 @@ body {
     margin-bottom: 20px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+
     background-clip: text;
     letter-spacing: -1.5px;
     line-height: 1.2;
+      color: white;
+    -webkit-text-fill-color: white;
+    background: none;
 }
 
 .home-hero p {
     font-size: 1.3rem;
-    color: var(--text-color);
+    color: white;
     opacity: 0.9;
     max-width: 800px;
     margin: 0 auto 40px;
@@ -196,67 +202,114 @@ h2::after {
 }
 
 /* How It Works Section */
+
+
 .how-it-works {
     background: linear-gradient(135deg, 
-        rgba(37, 99, 235, 0.05), 
-        rgba(16, 185, 129, 0.05));
+        rgba(0, 0, 0, 0.9) 0%, 
+        rgba(30, 30, 30, 0.95) 100%);
+        color: white;
     border-radius: var(--radius-lg);
     padding: 60px 40px;
-    margin: 80px 0;
+    margin: 80px auto;
     text-align: center;
+    max-width: 1200px;
+    width: calc(100% - 40px);
 }
 
 .how-it-works h2 {
     margin-bottom: 40px;
+    color: white;
+}
+.how-it-works h2::after {
+    background: linear-gradient(90deg, var(--secondary), white);
 }
 
 .steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
     margin-top: 40px;
+    flex-wrap: wrap;
 }
-
+.steps-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin: 40px 0;
+}
 .step-card {
-    background: var(--card-bg);
+ background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     border-radius: var(--radius-lg);
-    padding: 30px;
+    padding: 40px 30px;
     position: relative;
     box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 250px;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: white;   
 }
 
 .step-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-10px) scale(1.02);
+     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .step-number {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+     width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin: 0 auto 20px;
+    margin: 0 auto 25px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.step-number::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px dashed var(--primary);
+    animation: spin 20s linear infinite;
 }
 
 .step-card h3 {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    color: var(--text-color);
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: white;
+    font-weight: 700;
 }
 
 .step-card p {
-    color: var(--text-color);
-    opacity: 0.8;
-    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin: 0;
+}
+ .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    justify-content: center;
 }
 
 /* Stats Section */
@@ -268,50 +321,57 @@ h2::after {
 }
 
 .stat-item {
-    text-align: center;
-    padding: 30px;
-    background: var(--card-bg);
+   background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     border-radius: var(--radius-lg);
+    padding: 40px 30px;
+    text-align: center;
     box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
 .stat-item:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border-color: var(--primary);
+     background: rgba(255, 255, 255, 0.15);
 }
 
 .stat-number {
-    font-size: 2.8rem;
+       font-size: 3rem;
     font-weight: 800;
-    color: var(--primary);
+    color: white;
     line-height: 1;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+ 
 }
 
 .stat-label {
-    font-size: 1.1rem;
-    color: var(--text-color);
-    opacity: 0.8;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* CTA Section */
+/* CTA Section - Dark Themed */
 .cta-section {
     text-align: center;
     padding: 80px 20px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: white;
     border-radius: var(--radius-lg);
-    margin: 80px 0;
+    margin: 80px auto;
     position: relative;
     overflow: hidden;
+    max-width: 1200px;
+    width: calc(100% - 40px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .cta-section::before {
@@ -321,22 +381,30 @@ h2::after {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h20v20H0z" fill="none"/><path d="M3 3h2v2H3zm6 0h2v2H9zm6 0h2v2h-2zM3 9h2v2H3zm6 0h2v2H9zm6 0h2v2h-2zM3 15h2v2H3zm6 0h2v2H9zm6 0h2v2h-2z" fill="white" opacity=".05"/></svg>');
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .cta-content {
     position: relative;
     z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .cta-section h2 {
     color: white;
     font-size: 2.8rem;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .cta-section h2::after {
-    background: white;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .cta-section p {
@@ -344,6 +412,8 @@ h2::after {
     max-width: 600px;
     margin: 0 auto 40px;
     opacity: 0.9;
+    line-height: 1.8;
+    text-align: center;
 }
 
 .cta-buttons {
@@ -351,6 +421,7 @@ h2::after {
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 30px;
 }
 
 .cta-button {
@@ -361,37 +432,65 @@ h2::after {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     gap: 12px;
     min-width: 200px;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .cta-button.primary {
     background: white;
-    color: var(--primary);
-    border: none;
+    color: var(--text-color);
+    border: 2px solid transparent;
 }
 
 .cta-button.primary:hover {
-    background: var(--light-gray);
+    background: transparent;
+    color: white;
+    border-color: white;
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.cta-button.primary:hover::before {
+    opacity: 1;
 }
 
 .cta-button.secondary {
     background: transparent;
     color: white;
-    border: 3px solid white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
 }
 
 .cta-button.secondary:hover {
     background: white;
-    color: var(--primary);
+    color: var(--text-color);
+    border-color: white;
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.cta-button.secondary:hover::before {
+    opacity: 0;
 }
 
 /* Footer for Landing Page */
@@ -515,46 +614,10 @@ h2::after {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .home-hero {
-        padding: 60px 20px;
-    }
-    
-    .home-hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .home-hero p {
-        font-size: 1.1rem;
-    }
-    
-    .home-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .home-buttons .btn {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    h2 {
-        font-size: 2rem;
-    }
-    
-    .parking-card {
-        padding: 25px;
-    }
-    
-    .how-it-works {
-        padding: 40px 20px;
-    }
-    
-    .steps {
-        grid-template-columns: 1fr;
-    }
-    
     .cta-section {
         padding: 60px 20px;
+        margin: 60px auto;
+        width: calc(100% - 20px);
     }
     
     .cta-section h2 {
@@ -571,8 +634,45 @@ h2::after {
         max-width: 300px;
     }
     
-    .stats-section {
-        grid-template-columns: repeat(2, 1fr);
+    .how-it-works {
+        padding: 40px 20px;
+        margin: 60px auto;
+        width: calc(100% - 20px);
+    }
+    
+    .steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step-card {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cta-section h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-section p {
+        font-size: 1.1rem;
+    }
+    
+    .cta-button {
+        padding: 15px 30px;
+        font-size: 1rem;
+    }
+    
+    .step-card {
+        padding: 30px 20px;
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
@@ -632,3 +732,4 @@ html {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+

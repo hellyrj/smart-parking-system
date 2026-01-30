@@ -1,6 +1,4 @@
 import { Op, literal } from "sequelize";
-
-
 import sequelize from "../config/db.js";
 import { 
   parkingSpace, 
@@ -65,5 +63,60 @@ export const searchParking = async (req, res) => {
   }
 };
 
+export const getParkingDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Fetching parking details for ID: ${id}`);
 
+    // Validate ID
+    if (!id || isNaN(parseInt(id))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid parking ID"
+      });
+    }
 
+    // Get parking space
+    const parking = await parkingSpace.findOne({
+      where: { 
+        id: parseInt(id),
+        is_active: true 
+      }
+    });
+
+    if (!parking) {
+      return res.status(404).json({
+        success: false,
+        message: "Parking space not found or not active"
+      });
+    }
+
+    // Get location and images separately
+    const [location, images] = await Promise.all([
+      parkingLocation.findOne({ where: { parking_id: parking.id } }),
+      parkingImage.findAll({ where: { parking_id: parking.id } })
+    ]);
+
+    // Convert to plain object
+    const parkingData = parking.get({ plain: true });
+    
+    // Manually add location and images
+    parkingData.parkingLocations = location ? [location.get({ plain: true })] : [];
+    parkingData.parkingImages = images.map(img => img.get({ plain: true }));
+
+    res.json({
+      success: true,
+      data: parkingData
+    });
+
+  } catch (err) {
+    console.error("❌ Error in getParkingDetails:", err);
+    console.error("Full error:", err.stack);
+    
+    res.status(500).json({
+      success: false,
+      message: "Failed to get parking details",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
