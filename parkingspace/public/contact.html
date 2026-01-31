@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - EchoPark</title>
+  <script src="./js/guard.js"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/contact.css" />
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
+        </div>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="reservations.html">
+          <i class="fas fa-clock"></i> Reservation
+        </a>
+        <a href="contact.html" class="active">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container fade-in">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1><i class="fas fa-envelope"></i> Contact Us</h1>
+        <p>Get in touch with our team. We're here to help you with any questions about EchoPark.</p>
+      </div>
+
+      <!-- Contact Grid -->
+      <div class="contact-grid">
+        <!-- Contact Information -->
+        <div class="contact-info-section">
+          <h2><i class="fas fa-info-circle"></i> Contact Information</h2>
+          
+          <div class="contact-card">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>Our Location</h3>
+            <p>123 Parking St, City Center</p>
+          </div>
+          
+          <div class="contact-card">
+            <div class="contact-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <h3>Phone Number</h3>
+            <p>(+123) 456-7890</p>
+          </div>
+          
+          <div class="contact-card">
+            <div class="contact-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h3>Email Address</h3>
+            <p>support@echopark.com</p>
+            <p class="contact-subtext">24/7 email support</p>
+          </div>
+          
+          <div class="contact-card">
+            <div class="contact-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>Business Hours</h3>
+            <p>Monday - Friday: 9:00 AM - 8:00 PM</p>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-section">
+          <h2><i class="fas fa-paper-plane"></i> Send Us a Message</h2>
+          <p class="form-subtitle">Fill out the form below and we'll get back to you within 24 hours.</p>
+          
+          <form id="contactForm">
+            <div class="form-group">
+              <label for="name" class="form-label">
+                <i class="fas fa-user"></i> Full Name
+              </label>
+              <input 
+                type="text" 
+                id="name" 
+                class="form-control" 
+                placeholder="Enter your full name" 
+                required
+              />
+              <div class="form-error" id="nameError"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope"></i> Email Address
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                class="form-control" 
+                placeholder="Enter your email" 
+                required
+              />
+              <div class="form-error" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="subject" class="form-label">
+                <i class="fas fa-tag"></i> Subject
+              </label>
+              <select id="subject" class="form-control" required>
+                <option value="">Select a subject</option>
+                <option value="general">General Inquiry</option>
+                <option value="technical">Technical Support</option>
+                <option value="billing">Billing Issue</option>
+                <option value="feature">Feature Request</option>
+                <option value="partnership">Partnership Opportunity</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="form-error" id="subjectError"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="message" class="form-label">
+                <i class="fas fa-comment"></i> Message
+              </label>
+              <textarea 
+                id="message" 
+                class="form-control" 
+                rows="6" 
+                placeholder="Type your message here..." 
+                required
+              ></textarea>
+              <div class="form-error" id="messageError"></div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Send Message
+              </button>
+              <button type="reset" class="btn btn-secondary">
+                <i class="fas fa-redo"></i> Clear Form
+              </button>
+            </div>
+          </form>
+          
+          <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <h3>Message Sent Successfully!</h3>
+            <p>Thank you for contacting us. We'll get back to you within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="faq-section">
+        <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+        
+        <div class="faq-grid">
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>How do I reserve a parking spot?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>Simply go to the Home page, select a parking spot from the map or list, and click "Reserve Now". You'll need to confirm your reservation and payment details.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Can I cancel a reservation?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>Yes, you can cancel reservations up to 30 hour before the scheduled start time without any penalty. Go to "Active Sessions" to manage your bookings.</p>
+            </div>
+          </div>
+        
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>How do I become a parking host?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>Go to "Add Parking" in the navigation menu, fill out the parking space details, and submit for verification. Once approved, you can start hosting!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>EchoPark</h3>
+          <p>Revolutionizing urban parking with smart technology and real-time availability tracking.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="home.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+            <li><a href="add-parking.html"><i class="fas fa-chevron-right"></i> Add Parking</a></li>
+            <li><a href="my-parking.html"><i class="fas fa-chevron-right"></i> My Parking</a></li>
+            <li><a href="active-session.html"><i class="fas fa-chevron-right"></i> Active Sessions</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing Plans</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt"></i> 123 Parking St, City Center</li>
+            <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+            <li><i class="fas fa-envelope"></i> support@echopark.com</li>
+            <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>&copy; 2025 EchoPark. All rights reserved. | Smart Parking Solutions</p>
+        <p class="mt-20">Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for better urban mobility</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS FILES -->
+  <script src="./js/api.js"></script>
+  <script src="./js/contact.js"></script>
+  <script src="js/common.js"></script>
+</body>
+</html>

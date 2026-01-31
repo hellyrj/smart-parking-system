@@ -3,93 +3,62 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking - Login</title>
-    <link rel="stylesheet" href="./css/login.css" />
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        
-        .logo {
-            font-size: 3em;
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .forgot-password {
-            display: block;
-            text-align: right;
-            margin-top: 10px;
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-        
-        .register-link {
-            margin-top: 20px;
-            color: #666;
-        }
-        
-        .register-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>EchoPark - Login</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/dark-theme.css">
+    <link rel="stylesheet" href="./css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="container login-container">
-        <div class="logo">🚗</div>
-        <h2>Welcome Back</h2>
-        <p style="color: #666; margin-bottom: 30px;">Login to your Smart Parking account</p>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required />
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-parking"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p class="subtitle">Login to your EchoPark account to continue</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="email" placeholder="you@example.com" required />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" placeholder="••••••••" required />
+                    <div class="password-message" id="passwordMessage"></div>
+                </div>
+                
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <button type="submit" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login to Account
+                </button>
+            </form>
+            
+            <div class="register-link">
+                Don't have an account? <a href="register.html">Create one now</a>
             </div>
             
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required />
-                <a href="#" class="forgot-password">Forgot password?</a>
+            <div class="back-home">
+                <a href="index.html">
+                    <i class="fas fa-arrow-left"></i> Back to Homepage
+                </a>
             </div>
-            
-            <button type="submit" class="btn" style="width: 100%; padding: 15px;">
-                🔑 Login
-            </button>
-        </form>
-        
-        <div class="register-link">
-            Don't have an account? <a href="register.html">Register here</a>
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <a href="home.html" style="color: #666; text-decoration: none;">← Back to Home</a>
         </div>
     </div>
     
-    <script src="./js/auth.js"></script>
+   <script src="./js/auth.js"></script>
 </body>
 </html>

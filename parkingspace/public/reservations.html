@@ -10,41 +10,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container flex between center wrap">
-            <a class="brand" href="home.html">
-                <div class="mark">
-                    <i class="fas fa-parking"></i>
-                </div>
-                <span>EchoPark</span>
-            </a>
-            
-            <nav class="nav">
-                <a href="home.html">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                <a href="active-session.html">
-                    <i class="fas fa-clock"></i> Active Sessions
-                </a>
-                <a href="reservations.html" class="active">
-                    <i class="fas fa-calendar-check"></i> My Reservations
-                </a>
-                <a href="history.html">
-                    <i class="fas fa-history"></i> History
-                </a>
-                
-                <div class="header-actions">
-                    <div class="user-badge" id="userInfo">
-                        <i class="fas fa-user-circle"></i>
-                        <span id="userEmail">User</span>
-                    </div>
-                    <button class="btn btn-danger" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </nav>
+  <header class="site-header">
+    <div class="container flex between center wrap">
+      <a class="brand" href="home.html">
+        <div class="mark">
+          <i class="fas fa-parking"></i>
         </div>
-    </header>
+        <span>EchoPark</span>
+      </a>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+      
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <!-- Navigation Overlay -->
+      <div class="nav-overlay" id="navOverlay"></div>
+      
+      <nav class="nav" id="mainNav">
+        <a href="home.html" >
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="add-parking.html">
+          <i class="fas fa-plus-circle"></i> Add Parking
+        </a>
+        <a href="my-parking.html">
+          <i class="fas fa-list"></i> My Parking
+        </a>
+        <a href="active-session.html">
+          <i class="fas fa-clock"></i> Active Sessions
+        </a>
+        <a href="reservations.html"  class="active">
+          <i class="fas fa-clock"></i> Reservation
+        </a>
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i> Contact
+        </a>
+        
+        <div class="header-actions">
+          <div class="user-badge" id="userInfo">
+            <i class="fas fa-user-circle"></i>
+            <span id="userEmail">User</span>
+          </div>
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
 
     <main class="main-content">
         <div class="container">

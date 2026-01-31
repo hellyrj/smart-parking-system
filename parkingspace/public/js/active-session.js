@@ -276,120 +276,40 @@ function showLoading(show) {
     if (loadingEl) {
         loadingEl.style.display = show ? 'block' : 'none';
     }
-}function showPaymentDetails(result) {
+}  
+
+function showPaymentDetails(result) {
     try {
         const paymentDetails = document.getElementById('paymentDetails');
-        const paymentInfo = document.getElementById('paymentInfo');
-        
-        if (!paymentDetails || !paymentInfo) {
-            console.error("Payment detail elements not found");
+        if (!paymentDetails) {
+            console.error("Payment details element not found");
             return;
         }
         
-        // Format payment information
-        let paymentHTML = `
-            <div class="payment-summary">
-                <h3><i class="fas fa-receipt"></i> Payment Summary</h3>
-                <div class="payment-item">
-                    <span>Session ID:</span>
-                    <strong>${result.session_id || result.sessionId || 'N/A'}</strong>
-                </div>
-                <div class="payment-item">
-                    <span>Duration:</span>
-                    <strong>${result.duration_hours || result.hours || '0'} hours</strong>
-                </div>
-                <div class="payment-item">
-                    <span>Total Amount:</span>
-                    <strong>$${parseFloat(result.total_amount || result.amount || 0).toFixed(2)}</strong>
-                </div>
-                <div class="payment-item">
-                    <span>Status:</span>
-                    <strong class="status-completed">Completed</strong>
-                </div>
-        `;
-        
-        // Add payment information if available
-        if (result.payment) {
-            paymentHTML += `
-                <div class="payment-item">
-                    <span>Payment ID:</span>
-                    <strong>${result.payment.id || result.payment.payment_id || 'N/A'}</strong>
-                </div>
-                <div class="payment-item">
-                    <span>Payment Method:</span>
-                    <strong>${result.payment.payment_method || 'Wallet'}</strong>
-                </div>
-            `;
-        }
-        
-        paymentHTML += `
-                <div class="payment-timestamp">
-                    <small><i class="fas fa-clock"></i> Ended at: ${formatDateTime(new Date())}</small>
-                </div>
-            </div>
-        `;
-        
-        paymentInfo.innerHTML = paymentHTML;
+        // Show the payment details section
         paymentDetails.style.display = 'block';
         
-        // Add CSS styles if not already present
-        if (!document.querySelector('#paymentStyles')) {
-            const style = document.createElement('style');
-            style.id = 'paymentStyles';
-            style.textContent = `
-                .payment-summary {
-                    background: #f8f9fa;
-                    border-radius: 10px;
-                    padding: 20px;
-                    margin-top: 20px;
-                    border-left: 4px solid #10b981;
-                }
-                .payment-summary h3 {
-                    margin-bottom: 15px;
-                    color: #333;
-                    font-size: 18px;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-                .payment-summary h3 i {
-                    color: #10b981;
-                }
-                .payment-item {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 10px;
-                    padding-bottom: 10px;
-                    border-bottom: 1px solid #eee;
-                }
-                .payment-item:last-child {
-                    border-bottom: none;
-                }
-                .payment-item span {
-                    color: #666;
-                }
-                .payment-item strong {
-                    color: #333;
-                }
-                .status-completed {
-                    color: #10b981;
-                    font-weight: 600;
-                }
-                .payment-timestamp {
-                    margin-top: 15px;
-                    padding-top: 15px;
-                    border-top: 1px solid #eee;
-                    text-align: center;
-                    color: #888;
-                }
-                .payment-timestamp small i {
-                    margin-right: 5px;
-                }
-            `;
-            document.head.appendChild(style);
+        // Update the existing elements with data from result
+        document.getElementById('totalHours').textContent = 
+            `${result.duration_hours || result.hours || '0'} hours`;
+        
+        document.getElementById('totalAmount').textContent = 
+            `$${parseFloat(result.total_amount || result.amount || 0).toFixed(2)}`;
+        
+        document.getElementById('paymentStatus').textContent = 
+            result.payment_status || 'Completed';
+            
+        // Add status class for styling
+        const statusElement = document.getElementById('paymentStatus');
+        statusElement.className = 'info-value status-completed';
+        
+        // Optionally add more details if available
+        if (result.session_id) {
+            // You could add session ID if you want
+            console.log("Session ID:", result.session_id);
         }
         
-        console.log("Payment details displayed");
+        console.log("Payment details displayed successfully");
         
     } catch (error) {
         console.error("Error showing payment details:", error);

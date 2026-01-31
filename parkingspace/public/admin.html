@@ -47,6 +47,9 @@
                 <li data-section="users">
                     <i class="fas fa-users"></i> User Management
                 </li>
+                <li data-section="reviews">
+                    <i class="fas fa-clipboard-check"></i> Unified Reviews
+                </li>
                 <li data-section="owners">
                     <i class="fas fa-user-tie"></i> Owner Verification
                 </li>
@@ -139,6 +142,17 @@
                     </table>
                 </div>
                 <div class="pagination" id="usersPagination"></div>
+            </section>
+
+            <!-- Unified Reviews Section (NEW - Merges Owner + Parking + Documents + Payment) -->
+            <section id="reviews" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-clipboard-check"></i> Unified Reviews</h2>
+                    <p style="color: #666; margin-top: 0.5rem;">Review and approve/reject owners, parking spaces, documents, and payment proofs all in one place</p>
+                </div>
+                <div id="unifiedReviewsContainer">
+                    <!-- Unified reviews will be loaded here -->
+                </div>
             </section>
 
             <!-- Owner Verification Section -->
