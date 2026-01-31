@@ -1,0 +1,48 @@
+[build]
+  # Build command (runs in base directory)
+  command = "npm install"
+  
+  # Where your functions are located
+  functions = "netlify/functions"
+  
+  # Folder to publish (static files)
+  publish = "public"
+
+[build.environment]
+  # Node.js version
+  NODE_VERSION = "18"
+
+[functions]
+  # Bundler for serverless functions
+  node_bundler = "esbuild"
+  
+  # Increase timeout if needed (default: 10s)
+  # timeout = 30
+
+# Redirect API calls to serverless functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# If you have a frontend SPA (React/Vue/etc)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# CORS headers for API
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, x-auth-token"
+
+# Security headers for frontend
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

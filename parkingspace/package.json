@@ -4,15 +4,17 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "migrate": "node src/config/migration.js"
+    "dev": "node src/server.js",
+    "build":  "echo 'No build step needed'",
+    "migrate": "node src/config/migration.js",
+    "functions:dev": "netlify dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@netlify/functions": "^5.1.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -27,8 +29,12 @@
     "nodemailer": "^7.0.12",
     "resend": "^6.4.2",
     "sequelize": "^6.37.7",
+    "serverless-http": "^4.0.0",
     "uuid": "^13.0.0",
-    "ws": "^8.19.0"
+    "ws": "^8.19.0",
+    "@netlify/functions": "^2.0.0",
+    "serverless-http": "^3.0.0"
+
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
