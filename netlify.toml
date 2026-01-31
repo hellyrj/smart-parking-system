@@ -11,6 +11,7 @@
 [build.environment]
   # Node.js version
   NODE_VERSION = "18"
+    NETLIFY_DATABASE = "false"  
 
 [functions]
   # Bundler for serverless functions
