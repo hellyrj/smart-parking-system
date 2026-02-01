@@ -2,9 +2,11 @@
 .register-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 20px;
+  padding-top: 70px;
+  padding-bottom: 40px;
   position: relative;
 }
 
@@ -27,6 +29,13 @@
     0 0 0 1px rgba(255, 215, 0, 0.1),
     inset 0 0 20px rgba(255, 255, 255, 0.05);
   animation: slideUp 0.6s ease;
+}
+
+.register-card .logo {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  color: #FFD700;
+  text-align: center;
 }
 
 @keyframes slideUp {

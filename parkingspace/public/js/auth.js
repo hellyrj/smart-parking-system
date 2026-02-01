@@ -85,8 +85,8 @@ class Auth {
             return;
         }
 
-        if (password.length < 6) {
-            this.showAlert("Password must be at least 6 characters long", "error");
+        if (password.length < 8) {
+            this.showAlert("Password must be at least 8 characters long", "error");
             return;
         }
 

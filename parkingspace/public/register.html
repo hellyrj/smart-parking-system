@@ -49,25 +49,13 @@
                         </label>
                         <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required />
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="userType">
-                            <i class="fas fa-user-tag"></i> Account Type
-                        </label>
-                        <select id="userType" required>
-                            <option value="">Select account type</option>
-                            <option value="driver">Driver (Looking for parking)</option>
-                            <option value="host">Host (Have parking space)</option>
-                            <option value="both">Both (Driver & Host)</option>
-                        </select>
-                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">
                         <i class="fas fa-lock"></i> Password
                     </label>
-                    <input type="password" id="password" placeholder="••••••••" required />
+                    <input type="password" id="password" placeholder="••••••••" minlength="8" required />
                     <div class="password-strength" id="passwordStrength">
                         <div class="password-strength-bar" id="passwordStrengthBar"></div>
                     </div>
@@ -80,7 +68,7 @@
                     <label for="confirmPassword">
                         <i class="fas fa-lock"></i> Confirm Password
                     </label>
-                    <input type="password" id="confirmPassword" placeholder="••••••••" required />
+                    <input type="password" id="confirmPassword" placeholder="••••••••" minlength="8" required />
                     <div class="password-match" id="passwordMatch"></div>
                 </div>
                 
