@@ -180,7 +180,11 @@ const API = {
             },
             body: JSON.stringify(data),
         });
-        return res.json();
+        const json = await res.json();
+        if (!res.ok) {
+            return { message: json?.message || `Failed to update parking (HTTP ${res.status})` };
+        }
+        return json;
     },
 
     // ✅ OWNER: Delete parking
@@ -191,7 +195,11 @@ const API = {
                 Authorization: `Bearer ${getToken()}`,
             },
         });
-        return res.json();
+        const json = await res.json();
+        if (!res.ok) {
+            return { message: json?.message || `Failed to delete parking (HTTP ${res.status})` };
+        }
+        return json;
     },
 
     // ✅ OWNER: Deactivate parking
@@ -202,7 +210,11 @@ const API = {
                 Authorization: `Bearer ${getToken()}`,
             },
         });
-        return res.json();
+        const json = await res.json();
+        if (!res.ok) {
+            return { message: json?.message || `Failed to deactivate parking (HTTP ${res.status})` };
+        }
+        return json;
     },
 
     // ✅ OWNER: Activate parking
@@ -213,7 +225,11 @@ const API = {
                 Authorization: `Bearer ${getToken()}`,
             },
         });
-        return res.json();
+        const json = await res.json();
+        if (!res.ok) {
+            return { message: json?.message || `Failed to activate parking (HTTP ${res.status})` };
+        }
+        return json;
     },
 
     // ✅ OWNER: Get active sessions
@@ -433,6 +449,16 @@ const API = {
     // ✅ ADMIN: Get all parking spaces
     async getAdminParkings() {
         const res = await fetch(`${window.API_BASE}/admin/parkings`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+            },
+        });
+        return res.json();
+    },
+
+    // ✅ ADMIN: Review a specific parking submission
+    async getAdminParkingReview(parkingId) {
+        const res = await fetch(`${window.API_BASE}/admin/parkings/${parkingId}/review`, {
             headers: {
                 Authorization: `Bearer ${getToken()}`,
             },

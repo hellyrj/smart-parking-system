@@ -212,11 +212,11 @@ moveToLocation(lat, lng, displayName = "Searched Location") {
         try {
             // Get all parkings and find the one with matching ID
             const parkings = await API.getMyParkings();
-            const parking = parkings.find(p => p.id == this.editId);
-            
+            const parking = Array.isArray(parkings) ? parkings.find(p => p.id == this.editId) : null;
+
             if (!parking) {
                 alert("Parking not found");
-                window.location.href = "/my-parkings.html";
+                window.location.href = "/my-parking.html";
                 return;
             }
 
@@ -270,79 +270,93 @@ moveToLocation(lat, lng, displayName = "Searched Location") {
             });
         }
     }
-// In handleSubmit function, replace the data submission:
 
-async  handleSubmit(e) {
-    e.preventDefault();
+    async handleSubmit(e) {
+        e.preventDefault();
 
-    if (!this.selectedLatLng) {
-        this.showAlert("Please select a location on the map", "error");
-        return;
-    }
+        if (!this.selectedLatLng) {
+            this.showAlert("Please select a location on the map", "error");
+            return;
+        }
 
-    // Validate form
-    if (!this.validateForm()) return;
+        // Validate form
+        if (!this.validateForm()) return;
 
-    // Create FormData for file uploads
-    const formData = new FormData();
-    
-    // Add form fields
-    formData.append('name', document.getElementById("name").value);
-    formData.append('description', document.getElementById("description").value);
-    formData.append('total_spots', Number(document.getElementById("totalSpots").value));
-    formData.append('price_per_hour', Number(document.getElementById("price").value));
-    formData.append('latitude', this.selectedLatLng.lat);
-    formData.append('longitude', this.selectedLatLng.lng);
-    formData.append('address', document.getElementById("address").value);
-    formData.append('city', document.getElementById("city").value);
-
-    // For file uploads, you'll need to add file input elements to your HTML
-    // Example: <input type="file" id="parkingImages" multiple>
-    // <input type="file" id="legalDocument">
-    // <input type="file" id="paymentProof">
-
-    // Show loading
-    this.showLoading(true);
-
-    try {
-        let res;
+        // Create FormData for file uploads
+        const formData = new FormData();
         
-        if (this.isEditMode) {
-            // For edit mode, use regular JSON (no file upload)
-            const data = {
-                name: document.getElementById("name").value,
-                description: document.getElementById("description").value,
-                total_spots: Number(document.getElementById("totalSpots").value),
-                price_per_hour: Number(document.getElementById("price").value),
-                latitude: this.selectedLatLng.lat,
-                longitude: this.selectedLatLng.lng,
-                address: document.getElementById("address").value,
-                city: document.getElementById("city").value,
-            };
-            
-            res = await API.updateParking(this.editId, data);
-        } else {
-            // For create mode, use FormData
-            res = await API.createParking(formData);
+        // Add form fields
+        formData.append('name', document.getElementById("name").value);
+        formData.append('description', document.getElementById("description").value);
+        formData.append('total_spots', Number(document.getElementById("totalSpots").value));
+        formData.append('price_per_hour', Number(document.getElementById("price").value));
+        formData.append('latitude', this.selectedLatLng.lat);
+        formData.append('longitude', this.selectedLatLng.lng);
+        formData.append('address', document.getElementById("address").value);
+        formData.append('city', document.getElementById("city").value);
+
+        // Add file uploads (field names must match backend multer config)
+        const parkingImagesEl = document.getElementById('parkingImages');
+        if (parkingImagesEl && parkingImagesEl.files && parkingImagesEl.files.length > 0) {
+            Array.from(parkingImagesEl.files).forEach(file => {
+                formData.append('parking_images', file);
+            });
         }
 
-        if (res.message === "A parking spot already exists at this location") {
-            this.showAlert("⚠️ A parking spot already exists at this location! Please choose another location.", "warning");
-        } else if (res.message.includes("successfully")) {
-            this.showAlert(`✅ ${res.message}`, "success");
-            setTimeout(() => {
-                window.location.href = "/my-parkings.html";
-            }, 1500);
-        } else {
-            this.showAlert(res.message || "Operation failed", "error");
+        const legalDocumentEl = document.getElementById('legalDocument');
+        if (legalDocumentEl && legalDocumentEl.files && legalDocumentEl.files[0]) {
+            formData.append('legal_document', legalDocumentEl.files[0]);
         }
-    } catch (err) {
-        console.error("Submit error:", err);
-        this.showAlert("Something went wrong. Please try again.", "error");
-    } finally {
-        this.showLoading(false);
+
+        const paymentProofEl = document.getElementById('paymentProof');
+        if (paymentProofEl && paymentProofEl.files && paymentProofEl.files[0]) {
+            formData.append('payment_proof', paymentProofEl.files[0]);
+        }
+
+        // Show loading
+        this.showLoading(true);
+
+        try {
+            let res;
+            
+            if (this.isEditMode) {
+                // For edit mode, use regular JSON (no file upload)
+                const data = {
+                    name: document.getElementById("name").value,
+                    description: document.getElementById("description").value,
+                    total_spots: Number(document.getElementById("totalSpots").value),
+                    price_per_hour: Number(document.getElementById("price").value),
+                    latitude: this.selectedLatLng.lat,
+                    longitude: this.selectedLatLng.lng,
+                    address: document.getElementById("address").value,
+                    city: document.getElementById("city").value,
+                };
+                
+                res = await API.updateParking(this.editId, data);
+            } else {
+                // For create mode, use FormData
+                res = await API.createParking(formData);
+            }
+
+            if (res.message === "A parking spot already exists at this location") {
+                this.showAlert("⚠️ A parking spot already exists at this location! Please choose another location.", "warning");
+            } else if (String(res.message || '').includes("successfully")) {
+                this.showAlert(`✅ ${res.message}`, "success");
+                setTimeout(() => {
+                    window.location.href = "/my-parking.html";
+                }, 1500);
+            } else {
+                this.showAlert(res.message || "Operation failed", "error");
+            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            const backendMessage = err?.message || err?.error || null;
+            this.showAlert(backendMessage || "Something went wrong. Please try again.", "error");
+        } finally {
+            this.showLoading(false);
+        }
     }
-}
+
     validateForm() {
         const name = document.getElementById("name").value.trim();
         const totalSpots = document.getElementById("totalSpots").value;
@@ -371,35 +385,36 @@ async  handleSubmit(e) {
         if (window.auth && window.auth.showAlert) {
             window.auth.showAlert(message, type);
         } else {
-            alert(`${type.toUpperCase()}: ${message}`);
+            alert(`${String(type).toUpperCase()}: ${message}`);
         }
     }
-showLoading(show, text = null) {
-    if (window.auth && window.auth.showLoading) {
-        window.auth.showLoading(show);
-    } else {
-        const submitBtn = document.querySelector('#parkingForm button[type="submit"]');
-        const searchBtn = document.getElementById("searchBtn");
-        
-        if (submitBtn) {
-            submitBtn.disabled = show;
-            if (text && show) {
-                submitBtn.innerHTML = text;
-            } else {
-                submitBtn.innerHTML = show ? 
-                    '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>' : 
-                    (this.isEditMode ? 'Update Parking' : 'Save Parking');
+
+    showLoading(show, text = null) {
+        if (window.auth && window.auth.showLoading) {
+            window.auth.showLoading(show);
+        } else {
+            const submitBtn = document.querySelector('#parkingForm button[type="submit"]');
+            const searchBtn = document.getElementById("searchBtn");
+            
+            if (submitBtn) {
+                submitBtn.disabled = show;
+                if (text && show) {
+                    submitBtn.innerHTML = text;
+                } else {
+                    submitBtn.innerHTML = show ? 
+                        '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>' : 
+                        (this.isEditMode ? 'Update Parking' : 'Save Parking');
+                }
+            }
+            
+            if (searchBtn) {
+                searchBtn.disabled = show;
+                searchBtn.innerHTML = show ? 
+                    '<div class="spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>' : 
+                    'Search';
             }
         }
-        
-        if (searchBtn) {
-            searchBtn.disabled = show;
-            searchBtn.innerHTML = show ? 
-                '<div class="spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>' : 
-                'Search';
-        }
     }
-}
 }
 
 // Initialize when DOM is loaded

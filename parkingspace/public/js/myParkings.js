@@ -1,24 +1,4 @@
 const container = document.getElementById("parkingList");
-// Add a dashboard button if it's the myParkings page
-if (document.querySelector('h2')?.textContent.includes('My Parking Spaces')) {
-    const header = document.querySelector('h2');
-    const dashboardLink = document.createElement('a');
-    dashboardLink.href = '/owner-dashboard.html';
-    dashboardLink.innerHTML = '📊 Go to Owner Dashboard';
-    dashboardLink.style.cssText = `
-        display: inline-block;
-        margin-left: 20px;
-        padding: 8px 15px;
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
-    `;
-    header.insertAdjacentElement('afterend', dashboardLink);
-}
-
-
 loadMyParkings();
 
 
@@ -34,28 +14,70 @@ async function loadMyParkings() {
 
         parkings.forEach((p) => {
             const div = document.createElement("div");
-            div.className = "parking-card";
+            div.className = `parking-card${p.is_active ? '' : ' inactive'}`;
 
-            const status = p.is_active ? "🟢 Active" : "🔴 Inactive";
             const approvalStatus = p.approval_status ? `(${p.approval_status})` : '';
 
+            const locationObj = p.parkingLocation || p.parkingLocations?.[0] || p.ParkingLocations?.[0] || null;
+            const locationAddress = locationObj?.address
+                || (locationObj?.latitude && locationObj?.longitude ? `${locationObj.latitude}, ${locationObj.longitude}` : null)
+                || 'N/A';
+
+            const statusLabel = p.is_active ? 'Active' : 'Inactive';
+            const statusClass = p.is_active ? 'status-available' : 'status-inactive';
+
             div.innerHTML = `
-                <h3>${p.name}</h3>
-                <p>Status: ${status} ${approvalStatus}</p>
-                <p>Available: ${p.available_spots}/${p.total_spots}</p>
-                <p>Price/hour: $${p.price_per_hour}</p>
-                <p>Location: ${p.parkingLocation?.address || 'N/A'}</p>
+                <div class="parking-header">
+                    <h3 class="parking-name">${p.name}</h3>
+                    <span class="parking-status ${statusClass}">
+                        <i class="fas fa-circle"></i>
+                        ${statusLabel} ${approvalStatus}
+                    </span>
+                </div>
 
-                <button onclick="editParking(${p.id})">✏️ Edit</button>
+                <div class="parking-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Available</span>
+                        <span class="detail-value">${p.available_spots}/${p.total_spots}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Price / hour</span>
+                        <span class="detail-value price">Br ${p.price_per_hour}</span>
+                    </div>
+                </div>
 
-                ${p.is_active ?
-                    `<button onclick="deactivateParking(${p.id})">⛔ Deactivate</button>` :
-                    p.total_spots === 0 ?
-                        `<button disabled title="Add spots before activating">🚫 Cannot Activate</button>` :
-                        `<button onclick="activateParking(${p.id})">✅ Activate</button>`
-                }
+                <div class="parking-location">
+                    <i class="fas fa-location-dot"></i>
+                    <span>${locationAddress}</span>
+                </div>
 
-                <button onclick="deleteParking(${p.id})">🗑 Delete</button>
+                <div class="parking-actions">
+                    <button class="action-btn btn-edit" onclick="editParking(${p.id})">
+                        <i class="fas fa-pen"></i>
+                        Edit
+                    </button>
+
+                    ${p.is_active ?
+                        `<button class="action-btn btn-toggle" onclick="deactivateParking(${p.id})">
+                            <i class=\"fas fa-ban\"></i>
+                            Deactivate
+                        </button>` :
+                        p.total_spots === 0 ?
+                            `<button class="action-btn btn-toggle" disabled title="Add spots before activating">
+                                <i class=\"fas fa-triangle-exclamation\"></i>
+                                Cannot Activate
+                            </button>` :
+                            `<button class="action-btn btn-toggle" onclick="activateParking(${p.id})">
+                                <i class=\"fas fa-check\"></i>
+                                Activate
+                            </button>`
+                    }
+
+                    <button class="action-btn btn-delete" onclick="deleteParking(${p.id})">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </button>
+                </div>
             `;
 
             container.appendChild(div);

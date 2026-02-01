@@ -83,6 +83,7 @@ async function searchNearby(lat, lng) {
     const parkings = await API.searchParking(lat, lng);
     renderParkings(parkings);
     renderMarkers(parkings);
+    return parkings;
 }
 
 function moveMapToLocation(lat, lng, name) {
@@ -114,7 +115,7 @@ function renderMarkers(parkings) {
                 border: 2px solid white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             ">
-                <span style="font-size: 12px;">$${p.price_per_hour}</span>
+                <span style="font-size: 12px;">Br ${p.price_per_hour}</span>
             </div>`,
             className: 'parking-marker',
             iconSize: [30, 30]
@@ -124,14 +125,14 @@ function renderMarkers(parkings) {
             .addTo(map)
             .bindPopup(`
                 <div style="min-width: 200px;">
-                    <h4 style="margin: 0 0 10px 0; color: #2563eb;">${p.name}</h4>
-                    <p style="margin: 5px 0;"><strong>Price:</strong> $${p.price_per_hour}/hour</p>
+                    <h4 style="margin: 0 0 10px 0; color: #FFD700;">${p.name}</h4>
+                    <p style="margin: 5px 0;"><strong>Price:</strong> Br ${p.price_per_hour}/hour</p>
                     <p style="margin: 5px 0;"><strong>Available:</strong> ${p.available_spots} spots</p>
                     <p style="margin: 5px 0;"><strong>Address:</strong> ${loc.address || 'N/A'}</p>
                     <button onclick="startParking(${p.id})" 
                             style="
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                color: white;
+                                background: linear-gradient(135deg, #FFD700 0%, #e6c200 100%);
+                                color: #121212;
                                 border: none;
                                 padding: 10px 15px;
                                 border-radius: 8px;
@@ -173,10 +174,10 @@ function renderParkings(parkings) {
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
                     <h3>${p.name}</h3>
-                    <p style="color: #666; margin: 5px 0;">
+                    <p style="color: rgba(255, 255, 255, 0.72); margin: 5px 0;">
                         <i class="fas fa-location-dot"></i> ${p.parkingLocations?.[0]?.address || 'N/A'}
                     </p>
-                    <p style="font-size: 14px; color: #4b5563;">
+                    <p style="font-size: 14px; color: rgba(255, 255, 255, 0.65);">
                         <i class="fas fa-clock"></i> ${p.operating_hours || '24/7'}
                     </p>
                 </div>
@@ -186,16 +187,16 @@ function renderParkings(parkings) {
             <div style="display: flex; justify-content: space-between; margin: 15px 0;">
                 <div>
                     <div style="font-size: 24px; font-weight: bold; color: #059669;">
-                        $${p.price_per_hour}<span style="font-size: 14px; color: #6b7280;">/hour</span>
+                        Br ${p.price_per_hour}<span style="font-size: 14px; color: rgba(255, 255, 255, 0.65);">/hour</span>
                     </div>
-                    <div style="font-size: 12px; color: #6b7280;">Rate</div>
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.60);">Rate</div>
                 </div>
                 
                 <div style="text-align: right;">
-                    <div style="font-size: 16px; font-weight: bold; color: #2563eb;">
+                    <div style="font-size: 16px; font-weight: bold; color: #FFD700;">
                         ${p.total_spots} total spots
                     </div>
-                    <div style="font-size: 12px; color: #6b7280;">Capacity</div>
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.60);">Capacity</div>
                 </div>
             </div>
             
@@ -238,3 +239,57 @@ async function searchByLocation(lat, lng, source = "manual") {
     // Search for parking
     searchNearby(lat, lng);
 }
+
+async function focusParkingFromReservation() {
+    const parkingIdRaw = localStorage.getItem('viewParkingId');
+    if (!parkingIdRaw) return;
+
+    const parkingId = Number(parkingIdRaw);
+    const storedLat = localStorage.getItem('viewParkingLat');
+    const storedLng = localStorage.getItem('viewParkingLng');
+
+    let lat = storedLat ? Number(storedLat) : null;
+    let lng = storedLng ? Number(storedLng) : null;
+
+    try {
+        if ((lat === null || Number.isNaN(lat)) || (lng === null || Number.isNaN(lng))) {
+            const details = await API.getParkingDetails(parkingId);
+            const parking = details?.data;
+            const loc = parking?.parkingLocations?.[0];
+            if (loc?.latitude != null && loc?.longitude != null) {
+                lat = Number(loc.latitude);
+                lng = Number(loc.longitude);
+            }
+        }
+
+        if (lat === null || lng === null || Number.isNaN(lat) || Number.isNaN(lng)) {
+            window.location.hash = '#map';
+            return;
+        }
+
+        initMap(lat, lng);
+        map.setView([lat, lng], 16);
+        const parkings = await searchNearby(lat, lng);
+
+        const marker = markers.find(m => m?.parkingData?.id === parkingId);
+        if (marker) {
+            marker.openPopup();
+        } else if (Array.isArray(parkings)) {
+            const fallback = parkings.find(p => p?.id === parkingId);
+            if (fallback?.parkingLocations?.[0]) {
+                const loc = fallback.parkingLocations[0];
+                L.marker([loc.latitude, loc.longitude]).addTo(map).bindPopup(fallback.name || 'Parking').openPopup();
+            }
+        }
+
+        document.getElementById('map')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+        localStorage.removeItem('viewParkingId');
+        localStorage.removeItem('viewParkingLat');
+        localStorage.removeItem('viewParkingLng');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    focusParkingFromReservation();
+});

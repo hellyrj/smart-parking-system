@@ -3,6 +3,8 @@ import {
   User,
   UserDocument,
   parkingSpace,
+  parkingLocation,
+  parkingImage,
   payment,
   parkingSession,
   activityLog,
@@ -287,11 +289,18 @@ export const rejectDocument = async (req, res) => {
 export const getAllParkingSpaces = async (req, res) => {
   try {
     const parkings = await parkingSpace.findAll({
-      include: [{
-        model: User,
-        as: 'owner',
-        attributes: ['id', 'email']
-      }],
+      include: [
+        {
+          model: User,
+          as: 'owner',
+          attributes: ['id', 'email', 'role', 'verification_status']
+        },
+        {
+          model: parkingLocation,
+          attributes: ['address', 'city', 'latitude', 'longitude'],
+          required: false
+        }
+      ],
       order: [['createdAt', 'DESC']]
     });
     res.json(parkings);
@@ -301,11 +310,65 @@ export const getAllParkingSpaces = async (req, res) => {
   }
 };
 
+// Review a specific parking submission (parking + images + owner + docs + payment proof)
+export const getParkingSubmissionReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const parking = await parkingSpace.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: 'owner',
+          attributes: ['id', 'email', 'role', 'verification_status']
+        },
+        {
+          model: parkingLocation,
+          attributes: ['address', 'city', 'latitude', 'longitude'],
+          required: false
+        },
+        {
+          model: parkingImage,
+          attributes: ['image_url'],
+          required: false
+        }
+      ]
+    });
+
+    if (!parking) {
+      return res.status(404).json({ message: 'Parking space not found' });
+    }
+
+    const ownerId = parking.owner_id;
+
+    const [documents, paymentProofs] = await Promise.all([
+      UserDocument.findAll({
+        where: { user_id: ownerId },
+        order: [['createdAt', 'DESC']]
+      }),
+      PaymentProof.findAll({
+        where: { user_id: ownerId },
+        order: [['createdAt', 'DESC']]
+      })
+    ]);
+
+    res.json({
+      parking,
+      documents,
+      paymentProofs
+    });
+  } catch (error) {
+    console.error('Error fetching parking submission review:', error);
+    res.status(500).json({ message: 'Failed to fetch submission review' });
+  }
+};
+
 export const approveParkingSpace = async (req, res) => {
   try {
     const { id } = req.params;
     
     const parking = await parkingSpace.findByPk(id);
+
     if (!parking) {
       return res.status(404).json({ message: "Parking space not found" });
     }
@@ -313,6 +376,14 @@ export const approveParkingSpace = async (req, res) => {
     parking.approval_status = "approved";
     parking.is_active = true;
     await parking.save();
+
+    // If parking is approved, also verify the owner (owner dashboard access)
+    const owner = await User.findByPk(parking.owner_id);
+    if (owner) {
+      owner.role = 'owner';
+      owner.verification_status = 'verified';
+      await owner.save();
+    }
     
     await activityLog.create({
       user_id: req.user.id,
@@ -320,7 +391,7 @@ export const approveParkingSpace = async (req, res) => {
       target_parking_id: id
     });
     
-    res.json({ 
+    res.json({
       message: "Parking space approved",
       parking: {
         id: parking.id,
@@ -348,6 +419,14 @@ export const rejectParkingSpace = async (req, res) => {
     parking.approval_status = "rejected";
     parking.is_active = false;
     await parking.save();
+
+    // If rejected, prevent owner access
+    const owner = await User.findByPk(parking.owner_id);
+    if (owner) {
+      owner.role = 'user';
+      owner.verification_status = 'suspended';
+      await owner.save();
+    }
     
     await activityLog.create({
       user_id: req.user.id,
@@ -431,18 +510,14 @@ export const getDashboardStats = async (req, res) => {
       pendingVerifications,
       pendingPayments,
       pendingDocuments,
-      recentActivity
+      recentActivity,
+      totalSubscriptionFees
     ] = await Promise.all([
       User.count(),
       User.count({ where: { role: 'owner' } }),
       parkingSpace.count(),
       parkingSession.count({ where: { end_time: null } }),
-      User.count({ 
-        where: { 
-          role: 'owner',
-          verification_status: 'pending' 
-        } 
-      }),
+      parkingSpace.count({ where: { approval_status: 'pending' } }),
       payment.count({ where: { payment_status: "pending" } }),
       UserDocument.count({ where: { status: 'pending' } }),
       activityLog.findAll({
@@ -452,7 +527,8 @@ export const getDashboardStats = async (req, res) => {
           model: User,
           attributes: ['email']
         }]
-      })
+      }),
+      payment.sum('platform_fee', { where: { payment_status: 'paid' } })
     ]);
     
     console.log("Stats fetched successfully");
@@ -465,7 +541,8 @@ export const getDashboardStats = async (req, res) => {
         activeSessions,
         pendingVerifications,
         pendingPayments,
-        pendingDocuments
+        pendingDocuments,
+        totalSubscriptionFees: Number(totalSubscriptionFees || 0).toFixed(2)
       },
       recentActivity
     });

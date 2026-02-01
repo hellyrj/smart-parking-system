@@ -44,6 +44,7 @@ export const searchParking = async (req, res) => {
 
     const parkings = await parkingSpace.findAll({
       where: {
+        approval_status: "approved",
         is_active: true,
         available_spots: { [Op.gt]: 0 },
       },
@@ -80,6 +81,7 @@ export const getParkingDetails = async (req, res) => {
     const parking = await parkingSpace.findOne({
       where: { 
         id: parseInt(id),
+        approval_status: "approved",
         is_active: true 
       }
     });

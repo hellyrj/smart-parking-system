@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const PLATFORM_FEE_PERCENTAGE = 0.05; // 5%
+const PLATFORM_FEE_PERCENTAGE = 0.15; // 15%
 
 const Payment = sequelize.define("payment", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },

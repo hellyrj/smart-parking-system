@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EchoPark - Smart Parking System</title>
   <script src="./js/guard.js"></script>
   <link rel="stylesheet" href="./css/style.css" />
-    <link rel="stylesheet" href="./css/home.css" />
+  <link rel="stylesheet" href="./css/app-theme.css" />
+  <link rel="stylesheet" href="./css/home.css" />
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -82,25 +83,24 @@
 
 
       <!-- Search Section -->
-      <div class="search-container">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="🔍 Search for parking locations, addresses, or types..." 
-          aria-label="Search parking locations"
-        />
-        <button class="btn btn-primary" id="searchBtn">
-          <i class="fas fa-search"></i> Search
-        </button>
-      </div>
-      
-      <!-- Quick Actions -->
-      <div class="flex center wrap gap-20 mb-30">
+      <div class="search-row">
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="🔍 Search for parking locations, addresses, or types..." 
+            aria-label="Search parking locations"
+          />
+          <button class="btn btn-primary" id="searchBtn">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+
         <button class="btn btn-secondary" id="findParkingBtn">
           <i class="fas fa-location-dot"></i> Find Parking Near Me
         </button>
+      </div>
 
-      
       <!-- Alert -->
       <div class="alert alert-info">
         <i class="fas fa-info-circle"></i>

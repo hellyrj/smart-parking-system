@@ -138,18 +138,18 @@ class AdminDashboard {
                 description: "Currently active"
             },
             {
-                title: "Pending Verifications",
+                title: "Pending Reviews",
                 value: stats.pendingVerifications,
                 icon: "fas fa-clock",
                 color: "#ffd166",
-                description: "Awaiting approval"
+                description: "Parking submissions awaiting approval"
             },
             {
-                title: "Pending Payments",
-                value: stats.pendingPayments,
-                icon: "fas fa-money-bill-wave",
-                color: "#06d6a0",
-                description: "To be verified"
+                title: "Subscription Fees",
+                value: `Br ${stats.totalSubscriptionFees || '0.00'}`,
+                icon: "fas fa-receipt",
+                color: "#118ab2",
+                description: "Admin earning"
             }
         ];
 
@@ -234,7 +234,7 @@ renderPaymentsTable(paymentProofs) {
     <tr>
       <td>${payment.id}</td>
       <td>${payment.user?.email || 'N/A'}</td>
-      <td>$${payment.amount}</td>
+      <td>Br ${payment.amount}</td>
       <td>
         <span class="status-badge ${payment.payment_type === 'subscription' ? 'status-info' : 'status-warning'}">
           ${payment.payment_type}
@@ -353,7 +353,7 @@ renderPaymentsTable(paymentProofs) {
     <tr>
       <td>${payment.id}</td>
       <td>${payment.user?.email || 'N/A'}</td>
-      <td>$${payment.amount}</td>
+      <td>Br ${payment.amount}</td>
       <td>
         <span class="status-badge ${payment.payment_type === 'subscription' ? 'status-info' : 'status-warning'}">
           ${payment.payment_type}
@@ -476,22 +476,205 @@ async rejectPaymentProof(paymentId) {
                 case "users":
                     this.loadUsers();
                     break;
+                case "reviews":
+                    this.loadReviews();
+                    break;
                 case "owners":
                     this.loadOwners();
                     break;
-                case "documents":
-                    this.loadDocuments("pending");
-                    break;
                 case "parkings":
                     this.loadParkings();
-                    break;
-                case "payments":
-                    this.loadPayments();
                     break;
                 case "activity":
                     this.loadActivityLog();
                     break;
             }
+        }
+    }
+
+    async loadReviews() {
+        try {
+            this.showLoading(true);
+            const parkings = await API.getAdminParkings();
+            const pending = Array.isArray(parkings)
+                ? parkings.filter(p => String(p?.approval_status || '').toLowerCase() === 'pending')
+                : [];
+            this.renderReviews(pending);
+        } catch (error) {
+            this.showAlert("Failed to load reviews: " + error.message, "error");
+            this.renderReviews([]);
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    renderReviews(pendingParkings) {
+        const container = document.getElementById('unifiedReviewsContainer');
+        if (!container) return;
+
+        if (!pendingParkings || pendingParkings.length === 0) {
+            container.innerHTML = `
+                <div class="no-data" style="padding: 25px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+                    <p style="margin: 0; color: var(--text-color); opacity: 0.8;">No pending submissions to review.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Owner</th>
+                            <th>Parking</th>
+                            <th>City</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pendingParkings.map(p => {
+                            const loc = Array.isArray(p.parkingLocations) ? p.parkingLocations[0] : (p.parkingLocation || null);
+                            const city = loc?.city || 'N/A';
+                            const ownerEmail = p.owner?.email || 'N/A';
+                            return `
+                                <tr>
+                                    <td>${p.id}</td>
+                                    <td>${ownerEmail}</td>
+                                    <td>${p.name || 'N/A'}</td>
+                                    <td>${city}</td>
+                                    <td>
+                                        <span class="status-badge status-pending">pending</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-action btn-view" onclick="admin.reviewParking(${p.id})">
+                                            <i class="fas fa-eye"></i> Review
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    async reviewParking(parkingId) {
+        try {
+            this.showLoading(true);
+            const data = await API.getAdminParkingReview(parkingId);
+
+            if (!data || data.message) {
+                this.showAlert(data?.message || 'Failed to load review details', 'error');
+                return;
+            }
+
+            const parking = data.parking;
+            const documents = Array.isArray(data.documents) ? data.documents : [];
+            const paymentProofs = Array.isArray(data.paymentProofs) ? data.paymentProofs : [];
+
+            const loc = Array.isArray(parking?.parkingLocations) ? parking.parkingLocations[0] : (parking?.parkingLocation || null);
+            const images = Array.isArray(parking?.parkingImages) ? parking.parkingImages : [];
+            const doc = documents.find(d => String(d?.status || '').toLowerCase() === 'pending') || documents[0];
+            const pay = paymentProofs.find(p => String(p?.status || '').toLowerCase() === 'pending') || paymentProofs[0];
+
+            document.getElementById('modalTitle').textContent = `Review Submission #${parkingId}`;
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="user-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Owner:</span>
+                        <span class="detail-value">${parking?.owner?.email || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Parking:</span>
+                        <span class="detail-value">${parking?.name || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Price:</span>
+                        <span class="detail-value">Br ${parking?.price_per_hour || 0}/hr</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Location:</span>
+                        <span class="detail-value">${loc?.address || 'N/A'} ${loc?.city ? `, ${loc.city}` : ''}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Legal Document:</span>
+                        <span class="detail-value">
+                            ${doc?.file_url ? `<a href="${doc.file_url}" target="_blank" rel="noopener">View Document</a>` : 'Not provided'}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Proof:</span>
+                        <span class="detail-value">
+                            ${pay?.image_url ? `<a href="${pay.image_url}" target="_blank" rel="noopener">View Payment Image</a>` : (pay?.file_url ? `<a href="${pay.file_url}" target="_blank" rel="noopener">View Payment Image</a>` : 'Not provided')}
+                        </span>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <strong>Parking Images</strong>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;">
+                            ${(Array.isArray(images) && images.length > 0)
+                                ? images.map(img => `
+                                    <a href="${img.image_url}" target="_blank" rel="noopener" style="display:block;">
+                                        <img src="${img.image_url}" alt="Parking image" style="width:100%; height:90px; object-fit:cover; border-radius: 10px; border: 1px solid var(--border-color);" />
+                                    </a>
+                                `).join('')
+                                : '<div style="opacity:0.75;">No images uploaded</div>'}
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" style="margin-top: 20px;">
+                        <button class="btn-action btn-approve" onclick="admin.approveParkingFromReview(${parkingId})">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn-action btn-reject" onclick="admin.rejectParkingFromReview(${parkingId})">
+                            <i class="fas fa-times"></i> Deny
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            this.openModal('userModal');
+        } catch (error) {
+            this.showAlert('Failed to open review: ' + error.message, 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async approveParkingFromReview(parkingId) {
+        try {
+            const result = await API.approveParking(parkingId);
+            this.showAlert(result.message || 'Approved', 'success');
+            this.closeModal('userModal');
+            this.loadReviews();
+            this.loadParkings();
+            this.loadOwners();
+            this.loadDashboard();
+        } catch (error) {
+            this.showAlert('Failed to approve: ' + error.message, 'error');
+        }
+    }
+
+    async rejectParkingFromReview(parkingId) {
+        const reason = prompt('Enter rejection reason:');
+        if (!reason) return;
+
+        try {
+            const result = await API.rejectParking(parkingId, reason);
+            this.showAlert(result.message || 'Rejected', 'success');
+            this.closeModal('userModal');
+            this.loadReviews();
+            this.loadParkings();
+            this.loadOwners();
+            this.loadDashboard();
+        } catch (error) {
+            this.showAlert('Failed to reject: ' + error.message, 'error');
         }
     }
 
@@ -512,7 +695,7 @@ async rejectPaymentProof(paymentId) {
         const tbody = document.getElementById("usersTable");
         
         if (!users || users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No users found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found</td></tr>';
             return;
         }
 
@@ -531,11 +714,6 @@ async rejectPaymentProof(paymentId) {
                         user.verification_status === 'pending' ? 'status-pending' : 
                         'status-suspended'}">
                         ${user.verification_status || 'N/A'}
-                    </span>
-                </td>
-                <td>
-                    <span class="status-badge ${user.subscription_status === 'active' ? 'status-active' : 'status-inactive'}">
-                        ${user.subscription_status || 'inactive'}
                     </span>
                 </td>
                 <td>${new Date(user.createdAt).toLocaleDateString()}</td>
@@ -586,7 +764,9 @@ async rejectPaymentProof(paymentId) {
                         ${owner.verification_status}
                     </span>
                 </td>
-                <td>${owner.ownedParkings?.length || 0}</td>
+                <td>${Array.isArray(owner.ownedParkings)
+                    ? owner.ownedParkings.filter(p => String(p?.approval_status || '').toLowerCase() === 'approved').length
+                    : 0}</td>
                 <td>${owner.documents?.filter(d => d.status === 'approved').length || 0} / ${owner.documents?.length || 0}</td>
                 <td>
                     ${owner.verification_status === 'pending' ? `
@@ -710,7 +890,10 @@ async loadDocuments(filter = "pending") {
         try {
             this.showLoading(true);
             const parkings = await API.getAdminParkings();
-            this.renderParkingsTable(parkings);
+            const approved = Array.isArray(parkings)
+                ? parkings.filter(p => String(p?.approval_status || '').toLowerCase() === 'approved')
+                : [];
+            this.renderParkingsTable(approved);
         } catch (error) {
             this.showAlert("Failed to load parking spaces: " + error.message, "error");
         } finally {
@@ -732,8 +915,11 @@ async loadDocuments(filter = "pending") {
                 <td>${parking.id}</td>
                 <td>${parking.name}</td>
                 <td>${parking.owner?.email || 'N/A'}</td>
-                <td>${parking.location || 'N/A'}</td>
-                <td>$${parking.price_per_hour || '0'}/hr</td>
+                <td>${(Array.isArray(parking.parkingLocations) && parking.parkingLocations[0])
+                    ? `${parking.parkingLocations[0].address || 'N/A'}${parking.parkingLocations[0].city ? `, ${parking.parkingLocations[0].city}` : ''}`
+                    : (parking.parkingLocation ? `${parking.parkingLocation.address || 'N/A'}${parking.parkingLocation.city ? `, ${parking.parkingLocation.city}` : ''}` : 'N/A')}
+                </td>
+                <td>Br ${parking.price_per_hour || '0'}/hr</td>
                 <td>
                     <span class="status-badge ${parking.is_active ? 'status-active' : 'status-inactive'}">
                         ${parking.is_active ? 'Active' : 'Inactive'}

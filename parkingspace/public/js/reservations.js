@@ -74,6 +74,7 @@ function renderReservations() {
     // Update reservation timer banner
     updateReservationTimer();
 }
+
 // Update the createReservationCard function:
 
 function createReservationCard(reservation) {
@@ -124,7 +125,7 @@ function createReservationCard(reservation) {
                     <i class="fas fa-money-bill-wave"></i>
                     <div>
                         <small>Rate</small>
-                        <strong>$${parkingSpace.price_per_hour || '0'}/hour</strong>
+                        <strong>Br ${parkingSpace.price_per_hour || '0'}/hour</strong>
                     </div>
                 </div>
             </div>
@@ -147,7 +148,7 @@ function createReservationCard(reservation) {
             <button class="btn btn-outline" onclick="cancelReservation(${reservation.id})">
                 <i class="fas fa-times-circle"></i> Cancel
             </button>
-            <button class="btn btn-secondary" onclick="viewParkingDetails(${reservation.parking_id})">
+            <button class="btn btn-secondary" onclick="viewParkingDetails(${reservation.parking_id}, ${location.latitude ?? 'null'}, ${location.longitude ?? 'null'})">
                 <i class="fas fa-map-marker-alt"></i> View Location
             </button>
         </div>
@@ -155,6 +156,7 @@ function createReservationCard(reservation) {
     
     return card;
 }
+
 // Create recent reservation card
 function createRecentReservationCard(reservation) {
     const card = document.createElement('div');
@@ -216,6 +218,11 @@ async function cancelReservation(reservationId) {
         
         if (result.success) {
             alert('✅ Reservation cancelled successfully');
+
+            localStorage.removeItem('lastReservationId');
+            localStorage.removeItem('reservedUntil');
+            localStorage.removeItem('reservedParkingId');
+
             await loadReservations(); // Refresh list
         } else {
             throw new Error(result.message || 'Failed to cancel');
@@ -227,9 +234,16 @@ async function cancelReservation(reservationId) {
 }
 
 // View parking details
-function viewParkingDetails(parkingId) {
-    // Save parking ID and redirect to home with focus on this parking
+function viewParkingDetails(parkingId, lat = null, lng = null) {
+    // Save parking info and redirect to home with focus on this parking
     localStorage.setItem('viewParkingId', parkingId);
+    if (lat !== null && lng !== null) {
+        localStorage.setItem('viewParkingLat', String(lat));
+        localStorage.setItem('viewParkingLng', String(lng));
+    } else {
+        localStorage.removeItem('viewParkingLat');
+        localStorage.removeItem('viewParkingLng');
+    }
     window.location.href = 'home.html';
 }
 

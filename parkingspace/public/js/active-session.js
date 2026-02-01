@@ -107,7 +107,7 @@ function displayActiveSession(session) {
         // Get hourly rate
         const hourlyRate = parseFloat(parkingData.price_per_hour || session.price_per_hour || 5.00);
         document.getElementById('hourlyRate').textContent = 
-            `$${hourlyRate.toFixed(2)}/hr`;
+            `Br ${hourlyRate.toFixed(2)}/hr`;
         
         // Calculate initial estimated cost
         updateEstimatedCost(hourlyRate);
@@ -191,11 +191,11 @@ function updateEstimatedCost(hourlyRate = 5.00) {
         
         const estimatedCost = hours * hourlyRate;
         document.getElementById('estimatedCost').textContent = 
-            `$${estimatedCost.toFixed(2)}`;
+            `Br ${estimatedCost.toFixed(2)}`;
             
     } catch (error) {
         console.error("Error updating estimated cost:", error);
-        document.getElementById('estimatedCost').textContent = "$--";
+        document.getElementById('estimatedCost').textContent = "Br --";
     }
 }
 
@@ -294,7 +294,7 @@ function showPaymentDetails(result) {
             `${result.duration_hours || result.hours || '0'} hours`;
         
         document.getElementById('totalAmount').textContent = 
-            `$${parseFloat(result.total_amount || result.amount || 0).toFixed(2)}`;
+            `Br ${parseFloat(result.total_amount || result.amount || 0).toFixed(2)}`;
         
         document.getElementById('paymentStatus').textContent = 
             result.payment_status || 'Completed';

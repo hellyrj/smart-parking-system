@@ -1,6 +1,147 @@
 async function startParking(parkingId, vehiclePlate = '', vehicleModel = '') {
     try {
         console.log("Starting parking for parkingId:", parkingId);
+
+        try {
+            const sessionsData = await API.getDriverSessions();
+            const sessionsArray = Array.isArray(sessionsData)
+                ? sessionsData
+                : (sessionsData ? [sessionsData] : []);
+
+            const activeSession = sessionsArray.find(s => s && !s.end_time && String(s.status || '').toLowerCase() !== 'reserved');
+            if (activeSession) {
+                localStorage.setItem('activeSessionId', String(activeSession.id || activeSession.session_id || ''));
+                if (window.showAppConfirm) {
+                    await window.showAppConfirm({
+                        title: 'Already Active',
+                        message: 'You already have an active parking session. Please end it before starting a new one.',
+                        confirmText: 'OK',
+                        cancelText: 'Close'
+                    });
+                } else {
+                    alert('You already have an active parking session. Please end it before starting a new one.');
+                }
+                return false;
+            } else {
+                localStorage.removeItem('activeSessionId');
+            }
+
+            const reservedSession = sessionsArray.find(s => s && String(s.status || '').toLowerCase() === 'reserved');
+            if (reservedSession) {
+                if (reservedSession.id != null) {
+                    localStorage.setItem('lastReservationId', String(reservedSession.id));
+                }
+
+                if (window.showAppConfirm) {
+                    await window.showAppConfirm({
+                        title: 'Already Reserved',
+                        message: 'You already have an active reservation. Please use My Reservations or wait until it expires.',
+                        confirmText: 'OK',
+                        cancelText: 'Close'
+                    });
+                } else {
+                    alert('You already have an active reservation.');
+                }
+                return false;
+            }
+
+            const reservationsData = await API.getDriverReservations();
+            const reservations = Array.isArray(reservationsData?.reservations)
+                ? reservationsData.reservations
+                : [];
+
+            const activeReservation = reservations.find(r => {
+                const status = String(r?.reservation_status || r?.status || '').toLowerCase();
+                return status === 'active' || status === 'waiting' || status === 'reserved' || status === 'pending';
+            });
+
+            if (activeReservation) {
+                if (activeReservation.id != null) {
+                    localStorage.setItem('lastReservationId', String(activeReservation.id));
+                }
+
+                const timeString = activeReservation.reserved_until
+                    ? new Date(activeReservation.reserved_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : null;
+
+                if (window.showAppConfirm) {
+                    await window.showAppConfirm({
+                        title: 'Already Reserved',
+                        message: timeString
+                            ? `You already have an active reservation until <strong>${timeString}</strong>.\n\nPlease use My Reservations or wait until it expires.`
+                            : 'You already have an active reservation. Please use My Reservations.',
+                        confirmText: 'OK',
+                        cancelText: 'Close'
+                    });
+                } else {
+                    alert(timeString
+                        ? `You already have an active reservation until ${timeString}.`
+                        : 'You already have an active reservation.');
+                }
+                return false;
+            }
+        } catch (e) {
+            console.warn('Unable to validate server state. Falling back to local checks.', e);
+        }
+
+        const activeSessionId = localStorage.getItem('activeSessionId');
+        if (activeSessionId) {
+            if (window.showAppConfirm) {
+                await window.showAppConfirm({
+                    title: 'Already Active',
+                    message: 'You already have an active parking session. Please end it before starting a new one.',
+                    confirmText: 'OK',
+                    cancelText: 'Close'
+                });
+            } else {
+                alert('You already have an active parking session. Please end it before starting a new one.');
+            }
+            return false;
+        }
+
+        const lastReservationId = localStorage.getItem('lastReservationId');
+        const reservedUntil = localStorage.getItem('reservedUntil');
+        if (lastReservationId && reservedUntil) {
+            let shouldBlock = false;
+            let serverStatus = null;
+
+            try {
+                serverStatus = await API.checkReservationStatus(lastReservationId);
+            } catch (e) {
+                serverStatus = null;
+            }
+
+            const statusString = String(serverStatus?.reservation_status || serverStatus?.status || '').toLowerCase();
+            const serverExpired = serverStatus?.expired === true || statusString === 'expired' || statusString === 'cancelled' || statusString === 'canceled';
+            const serverActive = statusString === 'active' || statusString === 'waiting';
+
+            if (serverStatus) {
+                shouldBlock = serverActive && !serverExpired;
+            } else {
+                const remaining = Date.parse(reservedUntil) - Date.now();
+                shouldBlock = !Number.isNaN(remaining) && remaining > 0;
+            }
+
+            if (shouldBlock) {
+                const timeString = new Date(reservedUntil).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (window.showAppConfirm) {
+                    await window.showAppConfirm({
+                        title: 'Already Reserved',
+                        message: `You already have an active reservation until <strong>${timeString}</strong>.\n\nPlease use My Reservations or wait until it expires.`,
+                        confirmText: 'OK',
+                        cancelText: 'Close'
+                    });
+                } else {
+                    alert(`You already have an active reservation until ${timeString}.`);
+                }
+                return false;
+            }
+
+            // Stale/expired/cancelled reservation in localStorage
+            localStorage.removeItem('lastReservationId');
+            localStorage.removeItem('reservedUntil');
+            localStorage.removeItem('reservedParkingId');
+        }
         
         // 1. Get parking details first to show price
         const parkingResponse = await API.getParkingDetails(parkingId);
@@ -19,32 +160,27 @@ async function startParking(parkingId, vehiclePlate = '', vehicleModel = '') {
         // Get location for the popup message
         const location = parkingDetails.parkingLocations?.[0];
         const locationAddress = location ? (location.address || `${location.latitude}, ${location.longitude}`) : "Unknown location";
-        
-        // 2. Ask user if they want to reserve or start immediately
-        const userChoice = confirm(
-            `📍 ${parkingDetails.name}\n\n` +
-            `Location: ${locationAddress}\n` +
-            `Price: $${parkingDetails.price_per_hour}/hour\n` +
-            `Available spots: ${parkingDetails.available_spots}\n\n` +
-            `Do you want to:\n\n` +
-            `• Click OK to Reserve Now (30 min hold)\n` +
-            `• Click Cancel to Start Session Immediately`
-        );
-        
-        // 3. Get vehicle info
-        if (!vehiclePlate || !vehicleModel) {
-            const plate = prompt("Enter your vehicle license plate:");
-            if (!plate) {
-                alert("License plate is required");
-                return false;
-            }
-            
-            const model = prompt("Enter your vehicle model:", "Car");
-            vehiclePlate = plate.trim();
-            vehicleModel = model?.trim() || "Car";
+
+        if (!window.showReservationModal) {
+            alert('UI modal not loaded. Please refresh the page.');
+            return false;
         }
-        
-        if (userChoice) {
+
+        const modalResult = await window.showReservationModal({
+            parkingName: parkingDetails.name,
+            locationAddress,
+            pricePerHour: parkingDetails.price_per_hour,
+            availableSpots: parkingDetails.available_spots,
+            vehiclePlate,
+            vehicleModel
+        });
+
+        if (!modalResult) return false;
+
+        vehiclePlate = modalResult.vehiclePlate;
+        vehicleModel = modalResult.vehicleModel;
+
+        if (modalResult.action === 'reserve') {
             // RESERVE FLOW
             console.log("Reserving spot for 30 minutes...");
             const reservation = await API.reserveParkingSpot(parkingId, vehiclePlate, vehicleModel);
@@ -64,18 +200,16 @@ async function startParking(parkingId, vehiclePlate = '', vehicleModel = '') {
             // Show success with reservation details
             const reservedUntil = new Date(reservation.reserved_until);
             const timeString = reservedUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const reserveSuccess = confirm(
-                `✅ Reservation Successful!\n\n` +
-                `Location: ${parkingDetails.name}\n` +
-                `Address: ${locationAddress}\n` +
-                `Your spot is reserved until: ${timeString}\n` +
-                `(30 minutes from now)\n\n` +
-                `Do you want to:\n\n` +
-                `• Click OK: Go to My Reservations\n` +
-                `• Click Cancel: Stay on this page`
-            );
-            
+
+            const reserveSuccess = window.showAppConfirm
+                ? await window.showAppConfirm({
+                    title: 'Reservation Successful',
+                    message: `Your spot at <strong>${parkingDetails.name}</strong> is reserved until <strong>${timeString}</strong>.\n\nGo to My Reservations now?`,
+                    confirmText: 'Go to My Reservations',
+                    cancelText: 'Stay Here'
+                })
+                : confirm('Reservation successful. Go to My Reservations now?');
+
             if (reserveSuccess) {
                 // Redirect to reservations page
                 window.location.href = "reservations.html";
@@ -164,18 +298,7 @@ async function activateReservation(reservationId) {
 // In map.js, replace marker click handler with:
 function setupMarkerClickHandler(marker, parking) {
     marker.on('click', async function() {
-        // Show enhanced confirmation dialog with price
-        const confirmed = confirm(
-            `📍 ${parking.name}\n\n` +
-            `Price: $${parking.price_per_hour}/hour\n` +
-            `Available spots: ${parking.available_spots}\n` +
-            `Address: ${parking.parkingLocations?.[0]?.address || 'N/A'}\n\n` +
-            `Do you want to park here?`
-        );
-        
-        if (confirmed) {
-            // Start the parking process
-            await startParking(parking.id);
-        }
+        // Start the parking process (themed modal will collect plate/model and action)
+        await startParking(parking.id);
     });
 }

@@ -39,13 +39,32 @@ const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = {
-      'parking_images': ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
-      'legal_document': ['application/pdf'],
-      'payment_proof': ['image/jpeg', 'image/jpg', 'image/png']
+      'parking_images': ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/heic', 'image/heif'],
+      'legal_document': [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ],
+      'payment_proof': ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'image/heif', 'application/pdf']
     };
+
+    const allowedExt = {
+      'parking_images': ['.jpg', '.jpeg', '.png', '.gif', '.heic', '.heif'],
+      'legal_document': ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'],
+      'payment_proof': ['.pdf', '.jpg', '.jpeg', '.png', '.heic', '.heif']
+    };
+
+    const ext = path.extname(file.originalname || '').toLowerCase();
     
-    if (allowedTypes[file.fieldname] && 
-        allowedTypes[file.fieldname].includes(file.mimetype)) {
+    const isAllowedByMime =
+      allowedTypes[file.fieldname] && allowedTypes[file.fieldname].includes(file.mimetype);
+    const isAllowedByExt =
+      allowedExt[file.fieldname] && allowedExt[file.fieldname].includes(ext);
+
+    if (isAllowedByMime || isAllowedByExt) {
       cb(null, true);
     } else {
       cb(new Error(`Invalid file type for ${file.fieldname}`), false);
@@ -128,6 +147,8 @@ export const createParkingWithUpload = [
         total_spots,
         available_spots: total_spots,
         price_per_hour,
+        approval_status: "pending",
+        is_active: false,
       });
 
       // Create parking location
@@ -171,7 +192,9 @@ export const createParkingWithUpload = [
         if (!existingProof) {
           await PaymentProof.create({
             user_id: req.user.id,
-            image_url: `/uploads/payment_proofs/${req.files.payment_proof[0].filename}`,
+            payment_type: 'subscription',
+            amount: 0,
+            file_url: `/uploads/payment_proofs/${req.files.payment_proof[0].filename}`,
             status: 'pending'
           });
         }
@@ -410,8 +433,7 @@ export const getOwnerEarnings = async (req, res) => {
     // Get sessions for these parking spaces
     const sessions = await parkingSession.findAll({
       where: {
-        parking_id: { [Op.in]: parkingIds },
-        end_time: { [Op.not]: null }
+        parking_id: { [Op.in]: parkingIds }
       },
             attributes: ['id']
     });

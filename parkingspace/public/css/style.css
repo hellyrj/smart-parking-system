@@ -76,6 +76,23 @@ body {
   flex-direction: column;
 }
 
+.ep-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 99999;
+}
+
+.ep-modal {
+  width: min(640px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
 /* ===========================================
    LAYOUT & CONTAINER
    =========================================== */

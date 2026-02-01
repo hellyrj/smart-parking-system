@@ -10,11 +10,12 @@ import {
   verifyDocument,
   rejectDocument,
   getAllParkingSpaces,
+  getParkingSubmissionReview,
   approveParkingSpace,
   rejectParkingSpace,
   verifyPayment,
   getDashboardStats,
-    getAllPaymentProofs,
+  getAllPaymentProofs,
   verifyPaymentProof,
   rejectPaymentProof
 } from "../controllers/adminController.js";
@@ -44,6 +45,7 @@ router.post("/documents/:id/reject", rejectDocument);
 
 // Parking Space Approval
 router.get("/parkings", getAllParkingSpaces);
+router.get("/parkings/:id/review", getParkingSubmissionReview);
 router.post("/parkings/:id/approve", approveParkingSpace);
 router.post("/parkings/:id/reject", rejectParkingSpace);
 
