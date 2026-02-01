@@ -126,3 +126,4 @@ const PORT = process.env.PORT || 3000;
 
 // Export for use in other files if needed
 export { wss, broadcast, app, server };
+export default app;
