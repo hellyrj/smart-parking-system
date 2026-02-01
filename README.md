@@ -1,11 +1,9 @@
-I'll create a comprehensive README.md file for your parking system project based on your file structure and code.
 
-```markdown
 # 🅿️ Smart Parking System
 
 A comprehensive web-based parking management system with real-time tracking, reservations, and multi-user roles.
 
-![Parking System Screenshot](/public/Images/Screenshot%202026-01-30%20131540.png)
+parking system link: https://smart-parking-system-2lh9.onrender.com
 
 ## 📋 Table of Contents
 - [Features](#features)
