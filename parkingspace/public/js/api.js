@@ -2,7 +2,11 @@
 
 // Only declare API_BASE if it doesn't already exist
 if (typeof window.API_BASE === 'undefined') {
-    window.API_BASE = "http://localhost:3000/api";
+    window.API_BASE = "/api"; // Relative path works everywhere
+
+      // For debugging
+    console.log('API Base set to:', window.API_BASE);
+    console.log('Current origin:', window.location.origin);
 }
 
 // Helper function to get token
