@@ -95,6 +95,15 @@ app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
 
+// ================= HEALTH CHECK =================
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'Smart Parking System'
+  });
+});
+
 // ================= ERROR HANDLER ==============
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
@@ -110,11 +119,10 @@ if (!process.env.JWT_SECRET) {
 // ================= SERVER =====================
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`🔗 API: http://localhost:${PORT}/api`);
-  console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
-});
+//server.listen(PORT, () => {
+//  console.log(`🚀 Server running on http://localhost:${PORT}`);
+ // console.log(`🔗 API: http://localhost:${PORT}/api`);
+//});
 
 // Export for use in other files if needed
 export { wss, broadcast, app, server };

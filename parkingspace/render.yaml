@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: smart-parking-system
+    env: node
+    buildCommand: npm install && npm run migrate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+databases:
+  - name: smartparkingdb
+    databaseName: park
+    user: postgres
+    plan: free
