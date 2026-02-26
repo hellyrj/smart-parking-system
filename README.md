@@ -65,7 +65,6 @@ parking system link: https://smart-parking-system-2lh9.onrender.com
 - **Sequelize** - ORM for database
 - **PostgreSQL** - Database (configurable)
 - **JWT** - Authentication
-- **WebSocket** - Real-time communication
 - **Multer** - File upload handling
 - **Bcrypt** - Password hashing
 
@@ -117,8 +116,8 @@ smart-parking-system/
 
 1. **Clone the repository**
 ```bash
-git clone <your-repo-url>
-cd smart-parking-system
+git clone https://github.com/hellyrj/smart-parking-system/edit/main/README.md
+cd parkingspace
 ```
 
 2. **Install dependencies**
@@ -146,7 +145,7 @@ npm run migrate
 
 6. **Start the development server**
 ```bash
-npm run dev
+node src/app.js
 ```
 
 7. **Access the application**
@@ -178,7 +177,7 @@ After migration, these users are created:
 ### Starting the System
 ```bash
 # Development mode (with auto-reload)
-npm run dev
+node src/app.js
 
 # Production mode
 npm start
@@ -276,7 +275,6 @@ The system includes comprehensive error handling:
 
 ## 🔄 Real-time Features
 
-- WebSocket connections for live updates
 - Reservation expiration notifications
 - Session status updates
 - Admin approval notifications
@@ -312,16 +310,6 @@ JWT_SECRET=strong_production_secret
 ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
-### Docker Deployment (Optional)
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
 
 ## 🧪 Testing
 
@@ -399,6 +387,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Font Awesome for icons
 - Nominatim for geocoding
 - The open-source community
+- everyone who contribute in this project
 
 ## 📞 Support
 
