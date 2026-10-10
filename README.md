@@ -279,7 +279,7 @@ The system includes comprehensive error handling:
 - Session status updates
 - Admin approval notifications
 
-## 📊 Database Models
+##  Database Models
 
 Key models include:
 - **User** - User accounts with roles
@@ -292,14 +292,9 @@ Key models include:
 - **Notification** - User notifications
 - **ActivityLog** - System activity tracking
 
-## 🚀 Deployment
+##  Deployment
 
-### Render.com (Recommended)
-1. Push code to GitHub
-2. Create new Web Service on Render
-3. Connect your repository
-4. Add environment variables
-5. Deploy
+### Render.com
 
 ### Environment Variables for Production
 ```env
@@ -311,7 +306,7 @@ ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Run tests (if configured)
@@ -324,7 +319,7 @@ curl http://localhost:3000/api/health
 npm run db:test
 ```
 
-## 📈 Monitoring
+##  Monitoring
 
 - Health check endpoint: `/api/health`
 - Server logs with timestamps
@@ -332,7 +327,7 @@ npm run db:test
 - Error tracking
 - User activity logging
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -347,7 +342,7 @@ npm run db:test
 - Test changes thoroughly
 - Ensure backward compatibility
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -380,7 +375,7 @@ DEBUG=* npm run dev
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - OpenStreetMap for map data
 - Leaflet.js for interactive maps
@@ -389,7 +384,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - The open-source community
 - everyone who contribute in this project
 
-## 📞 Support
+##  Support
 
 For support, please:
 1. Check the documentation
@@ -398,8 +393,5 @@ For support, please:
 4. Include error logs and steps to reproduce
 
 ---
-
-**Made with ❤️ by Smart Parking System Team**
-
 *Last Updated: February 2026*
 
