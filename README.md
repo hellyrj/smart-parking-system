@@ -4,6 +4,10 @@
 A comprehensive web-based parking management system with real-time tracking, reservations, and multi-user roles.
 
 parking system link: https://smart-parking-system-2lh9.onrender.com
+=== DEFAULT LOGINS ===
+Admin: admin@parking.com / Admin@123
+Owner: owner@parking.com / Owner@123
+User: user@example.com / User@123
 
 ## 📋 Table of Contents
 - [Features](#features)
